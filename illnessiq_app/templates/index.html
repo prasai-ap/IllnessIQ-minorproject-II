@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IllnessIQ – Your Health Companion</title>
+  <link rel="stylesheet" href="{% static 'css/indexstyle.css' %}" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container">
+      <a href="{% url 'index' %}" class="logo">
+        <img src="{% static 'images/logo.png' %}" alt="IllnessIQ Logo">
+      </a>
+      <div class="nav-links">
+        <a href="{% url 'aboutus' %}">About Us</a>
+        <a href="{% url 'login' %}">Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="hero-content">
+      <h1>Smarter Health, Better Life</h1>
+      <p>Your AI-powered personal health companion designed for insight, care, and progress.</p>
+      <a href="{% url 'login' %}" class="cta-btn">Get Started</a>
+    </div>
+  </header>
+
+  <!-- Features Section -->
+  <section class="features">
+    <div class="container">
+      <h2 class="section-title">Key Features</h2>
+      <div class="cards">
+        <div class="card">
+          <h3>🧠 Disease Risk Checker</h3>
+          <p>Predict the risk of diseases using machine learning based on your health insights.</p>
+        </div>
+        <div class="card">
+          <h3>🤖 AI Recommendations</h3>
+          <p>Get health and wellness suggestions tailored just for you, powered by AI.</p>
+        </div>
+        <div class="card">
+          <h3>📁 Medical History</h3>
+          <p>Keep your health records organized, accessible, and safe in one place.</p>
+        </div>
+        <div class="card">
+          <h3>👤 Profile Dashboard</h3>
+          <p>Track your health journey, improvements, and personalized tips.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      &copy; 2025 IllnessIQ. All rights reserved.
+    </div>
+  </footer>
+
+</body>
+</html>

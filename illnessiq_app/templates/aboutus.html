@@ -1,0 +1,85 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About Us – IllnessIQ</title>
+  <link rel="stylesheet" href="{% static 'css/aboutusstyle.css' %}" />
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="container">
+      <a href="{%url 'index' %}" class="logo">
+        <img src="{% static 'images/logo.png' %}" alt="IllnessIQ Logo" />
+      </a>
+      <nav class="nav-links">
+        <a href="{%url 'login'%}">Login</a>
+      </nav>
+    </div>
+  </header>
+
+
+  <section class="hero">
+    <div class="container">
+      <h1>About IllnessIQ</h1>
+      <p>Your smart companion for wellness, AI-driven insights, and personalized health tracking.</p>
+    </div>
+  </section>
+
+  <section class="overview">
+    <div class="container">
+      <h2>Who We Are</h2>
+      <p>
+        IllnessIQ is a modern healthtech platform that leverages artificial intelligence to assess disease risks, offer lifestyle recommendations,
+        and keep track of medical history — all in one place. Born out of a mission to improve public access to predictive healthcare, IllnessIQ aims to empower users with better awareness and control over their well-being.
+      </p>
+    </div>
+  </section>
+
+  <section class="mission-values">
+    <div class="container two-columns">
+      <div class="mission">
+        <h3>Our Mission</h3>
+        <p>To simplify preventive healthcare through intelligent tools and build a healthier, more informed society.</p>
+      </div>
+      <div class="values">
+        <h3>Our Values</h3>
+        <ul>
+          <li>🧠 Innovation</li>
+          <li>❤️ User-Centric Care</li>
+          <li>🔒 Data Privacy</li>
+          <li>⚖️ Integrity</li>
+          <li>🌍 Impact</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="team">
+    <div class="container">
+      <h2>Meet the Developer Team </h2>
+      <div class="team-grid">
+        <div class="member">
+          <img src="{% static 'images/developerimage.jpg' %}" alt="Aayus Prasai" />
+          <h4>Aayus Prasai</h4>
+          <p>Developer of IllnessIQ</p>
+          <p class="bio">
+            Aayus is a tech enthusiast and Computer Information Systems student from Nepal who envisioned IllnessIQ as a smart solution to bridge
+            technology and personal healthcare. With expertise in Python, Django, Machine Learning, SpringBoot etc, he is passionate about building
+            systems that matter.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2025 IllnessIQ. Built in Nepal.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

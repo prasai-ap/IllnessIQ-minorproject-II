@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>OTP Verification – IllnessIQ</title>
+  <link rel="stylesheet" href="{% static 'css/loginstyle.css' %}">
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-box glass">
+      <h2>Enter OTP</h2>
+      <form method="POST">
+        {% csrf_token %}
+        <label for="otp">OTP Code</label>
+        <input type="text" name="otp" id="otp" maxlength="6" required />
+        <button type="submit" name="verify_btn" class="btn-login">Verify OTP</button>
+      </form>
+      
+      <form method="POST" style="margin-top: 10px;">
+        {% csrf_token %}
+        <input type="hidden" name="resend" value="1" />
+        <button type="submit" class="btn-login">Resend OTP</button>
+      </form>
+      
+      {% if messages %}
+        {% for message in messages %}
+          <p class="{{ message.tags }}">{{ message }}</p>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>

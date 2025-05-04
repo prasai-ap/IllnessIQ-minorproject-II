@@ -1,0 +1,168 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+
+.container {
+  width: 90%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 0;
+}
+
+
+.navbar {
+  background-color: #ffffff;
+  border-bottom: 1px solid #dee2e6;
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+ 
+}
+
+.navbar .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo img {
+  height: 85px;
+}
+
+.nav-links a {
+  margin-left: 1.5rem;
+  text-decoration: none;
+  color: #007bff;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: #0056b3;
+}
+
+
+.hero {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, #6f42c1, #20c997);
+  color: white;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.hero p {
+  font-size: 1.25rem;
+}
+
+
+.overview {
+  background-color: #ffffff;
+  padding: 3rem 2rem;
+}
+
+.overview h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.overview p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+
+.mission-values {
+  background-color: #e9ecef;
+  padding: 3rem 2rem;
+}
+
+.two-columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.mission, .values {
+  flex: 1;
+  min-width: 300px;
+}
+
+.mission h3, .values h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.values ul {
+  list-style: none;
+  padding: 0;
+}
+
+.values li {
+  font-size: 1.1rem;
+  padding: 0.3rem 0;
+}
+
+
+.team {
+  background-color: #ffffff;
+  padding: 3rem 2rem;
+}
+
+.team h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+}
+
+.team-grid {
+  display: flex;
+  justify-content: center;
+}
+
+.member {
+  text-align: center;
+  max-width: 300px;
+}
+
+.member img {
+  width: 180px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid #20c997;
+  margin-bottom: 1rem;
+}
+
+.member h4 {
+  font-size: 1.4rem;
+  margin-bottom: 0.25rem;
+}
+
+.member p {
+  margin: 0.25rem 0;
+  font-size: 1rem;
+}
+
+.bio {
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+
+.footer {
+  background-color: #343a40;
+  color: #ffffff;
+  text-align: center;
+  padding: 1.5rem 0;
+  font-size: 0.9rem;
+}
