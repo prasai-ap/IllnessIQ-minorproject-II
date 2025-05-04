@@ -6,69 +6,72 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>About Us – IllnessIQ</title>
   <link rel="stylesheet" href="{% static 'css/aboutusstyle.css' %}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
   <header class="navbar">
     <div class="container">
-      <a href="{%url 'index' %}" class="logo">
+      <a href="{% url 'index' %}" class="logo">
         <img src="{% static 'images/logo.png' %}" alt="IllnessIQ Logo" />
       </a>
       <nav class="nav-links">
-        <a href="{%url 'login'%}">Login</a>
+        <a href="{% url 'login' %}">Login</a>
       </nav>
     </div>
   </header>
 
-
   <section class="hero">
     <div class="container">
-      <h1>About IllnessIQ</h1>
-      <p>Your smart companion for wellness, AI-driven insights, and personalized health tracking.</p>
+      <h1>Empowering Your Health Journey with IllnessIQ</h1>
+      <p>Your intelligent wellness partner for proactive, AI-driven healthcare.</p>
     </div>
   </section>
 
-  <section class="overview">
+  <section class="overview fade-in">
     <div class="container">
       <h2>Who We Are</h2>
       <p>
-        IllnessIQ is a modern healthtech platform that leverages artificial intelligence to assess disease risks, offer lifestyle recommendations,
-        and keep track of medical history — all in one place. Born out of a mission to improve public access to predictive healthcare, IllnessIQ aims to empower users with better awareness and control over their well-being.
+        IllnessIQ is a next-generation healthtech platform combining AI innovation with user-centric design to help you assess disease risks,
+        get personalized wellness recommendations, and manage medical history—all in one seamless experience.
+        <br/><br/>
+        Built with care in Nepal, our mission is to make predictive healthcare accessible, intuitive, and empowering.
       </p>
     </div>
   </section>
 
-  <section class="mission-values">
+  <section class="mission-values fade-in">
     <div class="container two-columns">
-      <div class="mission">
-        <h3>Our Mission</h3>
-        <p>To simplify preventive healthcare through intelligent tools and build a healthier, more informed society.</p>
+      <div class="mission card">
+        <h3>🎯 Our Mission</h3>
+        <p>To simplify preventive healthcare through smart technology and build a healthier, more informed society.</p>
       </div>
-      <div class="values">
-        <h3>Our Values</h3>
+      <div class="values card">
+        <h3>💡 Our Core Values</h3>
         <ul>
-          <li>🧠 Innovation</li>
-          <li>❤️ User-Centric Care</li>
-          <li>🔒 Data Privacy</li>
-          <li>⚖️ Integrity</li>
-          <li>🌍 Impact</li>
+          <li>🧠 Innovation that drives change</li>
+          <li>❤️ Compassionate, user-first design</li>
+          <li>🔒 Privacy and security as a priority</li>
+          <li>⚖️ Transparency and integrity</li>
+          <li>🌍 Making a global impact from Nepal</li>
         </ul>
       </div>
     </div>
   </section>
 
-  <section class="team">
+  <section class="team fade-in">
     <div class="container">
-      <h2>Meet the Developer Team </h2>
+      <h2>👨‍💻 Meet the Developer</h2>
       <div class="team-grid">
-        <div class="member">
-          <img src="{% static 'images/developerimage.jpg' %}" alt="Aayus Prasai" />
+        <div class="member card">
+          <img src="{% static 'images/developerimage.jpg' %}" alt="Aayus Prasai" class="profile-img"/>
           <h4>Aayus Prasai</h4>
-          <p>Developer of IllnessIQ</p>
+          <p class="role">Founder & Developer</p>
           <p class="bio">
-            Aayus is a tech enthusiast and Computer Information Systems student from Nepal who envisioned IllnessIQ as a smart solution to bridge
-            technology and personal healthcare. With expertise in Python, Django, Machine Learning, SpringBoot etc, he is passionate about building
-            systems that matter.
+            Aayus is a driven tech innovator from Nepal, currently pursuing Computer Information Systems. He founded IllnessIQ with the vision
+            of bridging technology and personal wellness. Passionate about impactful systems, his expertise includes Python, Django, Machine Learning, and Spring Boot.
           </p>
         </div>
       </div>
@@ -77,7 +80,7 @@
 
   <footer class="footer">
     <div class="container">
-      <p>&copy; 2025 IllnessIQ. Built in Nepal.</p>
+      <p>&copy; 2025 IllnessIQ. Made with ❤️ in Nepal.</p>
     </div>
   </footer>
 
