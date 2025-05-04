@@ -13,7 +13,7 @@ body {
 
 
 .navbar {
-  background-color: #2a9d8f;
+  background-color: #ffffff;
   padding: 1rem 0;
   box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
@@ -32,7 +32,7 @@ body {
 }
 
 .nav-links a {
-  color: white;
+  color: rgb(56, 179, 219);
   text-decoration: none;
   margin-left: 1.5rem;
   font-weight: 600;
@@ -40,13 +40,13 @@ body {
 }
 
 .nav-links a:hover {
-  color: #e9f5f3;
+  color: #2921c0;
 }
 
 
 .hero {
-  background: linear-gradient(to right, #2a9d8f, #56c3b5);
-  color: white;
+  background: linear-gradient(to right, #0458cf, #5da4de);
+  color: rgb(0, 0, 0);
   padding: 100px 20px;
   text-align: center;
 }
@@ -65,8 +65,8 @@ body {
 }
 
 .cta-btn {
-  background-color: #fefae0;
-  color: #264653;
+  background-color: #8098e7;
+  color: #ffffff;
   padding: 0.8rem 1.5rem;
   border-radius: 30px;
   font-weight: bold;
@@ -75,7 +75,7 @@ body {
 }
 
 .cta-btn:hover {
-  background-color: #e9e1b5;
+  background-color: #5243fa;
 }
 
 
@@ -88,7 +88,7 @@ body {
   text-align: center;
   font-size: 2rem;
   margin-bottom: 2rem;
-  color: #2a9d8f;
+  color: #000000;
 }
 
 .cards {
@@ -100,7 +100,7 @@ body {
 }
 
 .card {
-  background-color: #e0f7f1;
+  background-color: #dfe0ed;
   border-radius: 15px;
   padding: 2rem;
   text-align: center;
@@ -125,8 +125,8 @@ body {
 
 
 .footer {
-  background-color: #2a9d8f;
-  color: white;
+  background-color: #c1e8ff;
+  color: #000000;
   text-align: center;
   padding: 1rem 20px;
   margin-top: 60px;
