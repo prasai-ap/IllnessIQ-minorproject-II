@@ -1,84 +1,100 @@
-body {
-  font-family: 'Inter', sans-serif;
+/* Base Reset */
+* {
   margin: 0;
   padding: 0;
-  background-color: #f9f9fc;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+  background-color: #f9fafb;
   color: #333;
 }
 
+/* Container */
 .container {
-  max-width: 1100px;
-  margin: auto;
-  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
-a {
-  text-decoration: none;
-  color: #1d4ed8;
-}
-
-
+/* NAVBAR */
 .navbar {
   background-color: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
-  padding: 1rem 2rem;
+  padding: 0.5rem 0; /* smaller height */
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.navbar .container {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.logo img {
-  height: 45px;
+.navbar .logo img {
+  height: 40px;
 }
 
-.nav-links a {
-  font-weight: 600;
+.navbar .nav-links a {
   margin-left: 1.5rem;
+  text-decoration: none;
+  color: #333;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: color 0.3s ease;
 }
 
+.navbar .nav-links a:hover {
+  color: #007bff;
+}
 
+/* HERO SECTION */
 .hero {
-  background: linear-gradient(to right, #dbeafe, #f0f9ff);
+  background: linear-gradient(135deg, #e0f7fa, #ffffff);
+  padding: 4rem 1rem;
   text-align: center;
-  padding: 4rem 2rem;
 }
 
 .hero h1 {
   font-size: 2.5rem;
+  font-weight: 700;
   margin-bottom: 1rem;
-  color: #1e3a8a;
+  color: #004d40;
 }
 
 .hero p {
   font-size: 1.2rem;
-  color: #475569;
+  color: #555;
 }
 
-.overview {
-  background-color: #fff;
-  padding: 3rem 2rem;
-  border-radius: 1rem;
-  margin-top: 2rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-}
-
-.overview h2 {
+/* SECTION TITLES */
+section h2 {
   font-size: 2rem;
   margin-bottom: 1rem;
-  color: #111827;
+  color: #212121;
 }
 
-.overview p {
-  font-size: 1.05rem;
-  line-height: 1.8;
+section h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.8rem;
+  color: #00796b;
 }
 
+/* OVERVIEW SECTION */
+.overview {
+  padding: 3rem 1rem;
+  background-color: #ffffff;
+}
+
+/* MISSION & VALUES */
 .mission-values {
-  margin-top: 2rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2rem;
-  justify-content: space-between;
+  background-color: #f0f4f8;
+  padding: 3rem 1rem;
 }
 
 .two-columns {
@@ -88,46 +104,101 @@ a {
 }
 
 .card {
-  background-color: #ffffff;
-  padding: 2rem;
+  background: #ffffff;
+  padding: 1.5rem;
   border-radius: 1rem;
-  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
-  flex: 1 1 45%;
-  transition: transform 0.3s ease;
-}
-
-.card:hover {
-  transform: translateY(-5px);
-}
-
-.card h3 {
-  margin-top: 0;
-  color: #1f2937;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  flex: 1;
+  min-width: 280px;
 }
 
 .card ul {
   list-style: none;
-  padding: 0;
+  padding-left: 0;
 }
 
 .card li {
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.5rem;
   font-size: 1rem;
 }
 
-
+/* TEAM SECTION */
 .team {
-  padding: 4rem 2rem;
+  background-color: #ffffff;
+  padding: 3rem 1rem;
   text-align: center;
-}
-
-.team h2 {
-  font-size: 2rem;
-  margin-bottom: 2rem;
 }
 
 .team-grid {
   display: flex;
   justify-content: center;
-  gap: 2rem
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.member {
+  max-width: 320px;
+  text-align: left;
+}
+
+.profile-img {
+  width: 100%;
+  border-radius: 1rem;
+  margin-bottom: 1rem;
+  object-fit: cover;
+}
+
+.role {
+  font-weight: 600;
+  color: #00796b;
+  margin-bottom: 0.5rem;
+}
+
+.bio {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+/* FOOTER */
+.footer {
+  background-color: #263238;
+  color: #fff;
+  padding: 1rem 0;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+/* Animations */
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeIn 1s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .two-columns {
+    flex-direction: column;
+  }
+
+  .hero h1 {
+    font-size: 2rem;
+  }
+
+  .hero p {
+    font-size: 1rem;
+  }
+
+  .navbar .nav-links a {
+    margin-left: 1rem;
+    font-size: 0.9rem;
+  }
 }
