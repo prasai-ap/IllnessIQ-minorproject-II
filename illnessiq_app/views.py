@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.db import connection
 from django.contrib import messages
-import hashlib,random ,datetime
+import random ,datetime
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
@@ -121,3 +121,10 @@ def signup(request):
 
         messages.success(request, "Account created successfully.")
     return render(request,'signup.html')
+
+def user_dashboard(request):
+    return render(request,'user_dash.html')
+
+def admin_dashboard(request):
+    return render(request,'admin_dash.html')
+    
