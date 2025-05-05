@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IllnessIQ Dashboard</title>
+  <link rel="stylesheet" href="{% static 'css/userdash.css' %}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo"><img src ="{% static 'images/logo.png'%}"></div>
+    <div class="dropdown">
+        <button class="dropdown-toggle" id="dropdownBtn">👤</button>
+        <ul class="dropdown-menu" id="dropdownMenu">
+          <li><a href="#">History</a></li>
+          <li><a href="#">Feedback</a></li>
+          <li><a href="#">Report Issue</a></li>
+          <li><a href="#">Logout</a></li>
+        </ul>
+    </div>
+  </nav>
+
+  <main class="dashboard">
+    <h1>Welcome back! Choose a prediction service</h1>
+    <div class="card-container">
+      <a href="" class="card card-diabetes">
+        <img src="{% static 'images/diabetes.jpg' %}" alt="Diabetes" />
+        <p>Diabetes Prediction</p>
+      </a>
+      <a href="" class="card card-heart">
+        <img src="{% static 'images/heart.jpg' %}" alt="Heart Disease" />
+        <p>Heart Disease Prediction</p>
+      </a>
+      <a href="" class="card card-liver">
+        <img src="{% static 'images/liver.jpeg' %}" alt="Liver Disease" />
+        <p>Liver Disease Prediction</p>
+      </a>
+    </div>
+  </main>
+</body>
+<script>
+    const dropdownBtn = document.getElementById('dropdownBtn');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+  
+    dropdownBtn.addEventListener('click', () => {
+      dropdownMenu.classList.toggle('show');
+    });
+  
+    window.addEventListener('click', (e) => {
+      if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+        dropdownMenu.classList.remove('show');
+      }
+    });
+  </script>
+</html>

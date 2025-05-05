@@ -72,7 +72,6 @@ def verify_otp(request):
             return redirect('verify_otp')
 
         else:
-            # Verify OTP
             input_otp = request.POST.get('otp')
 
             with connection.cursor() as cursor:
@@ -127,4 +126,3 @@ def user_dashboard(request):
 
 def admin_dashboard(request):
     return render(request,'admin_dash.html')
-    

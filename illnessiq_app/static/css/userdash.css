@@ -1,0 +1,154 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  body {
+    background: linear-gradient(to right, #eef2f3, #dbe9f4);
+    color: #1d3557;
+  }
+  
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 0.8rem 1.5rem;
+    font-family: 'Inter', sans-serif;
+    position: relative;
+    z-index: 100;
+  }
+  
+  .navbar .logo img {
+    height: 45px;
+    width: auto;
+  }
+  
+  .nav-links {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+  }
+  
+  .nav-links a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+  }
+  
+  .nav-links a:hover {
+    color: #a8dadc;
+  }
+  
+  .dashboard {
+    padding: 3rem 2rem;
+    text-align: center;
+  }
+  
+  .dashboard h1 {
+    font-size: 2rem;
+    margin-bottom: 2.5rem;
+    color: #000000;
+  }
+  
+  .card-container {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  
+  .card {
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    padding: 2rem 1.5rem;
+    width: 250px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .card img {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 1rem;
+  }
+  
+  .card p {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1d3557;
+  }
+  
+  .card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
+  }
+  
+  .card-diabetes img {
+    filter: drop-shadow(0 0 3px rgb(74, 170, 226));
+  }
+  
+  .card-heart img {
+    filter: drop-shadow(0 0 3px rgb(74, 170, 226));
+  }
+  
+  .card-liver img {
+    filter: drop-shadow(0 0 3px rgb(74, 170, 226));
+  }
+  
+  .dropdown {
+    position: relative;
+  }
+  
+  .dropdown-toggle {
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
+    border: none;
+    font-size: 1rem;
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    border-radius: 8px;
+    font-weight: 600;
+  }
+  
+  .dropdown-menu {
+    position: absolute;
+    right: 0;
+    top: 120%;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    list-style: none;
+    padding: 0.5rem 0;
+    display: none;
+    z-index: 999;
+    min-width: 160px;
+  }
+  
+  .dropdown-menu li {
+    border-bottom: 1px solid #eee;
+  }
+  
+  .dropdown-menu li:last-child {
+    border-bottom: none;
+  }
+  
+  .dropdown-menu a {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: #1d3557;
+    text-decoration: none;
+    transition: background 0.3s;
+  }
+  
+  .dropdown-menu a:hover {
+    background-color: #f1f5f9;
+  }
+  
+  .show {
+    display: block;
+  }
