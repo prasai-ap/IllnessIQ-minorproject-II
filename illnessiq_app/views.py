@@ -21,14 +21,11 @@ def send_otp_email(user_email, otp):
 def login(request):
     if request.method == 'POST':
         email = request.POST.get('email')
-        password = request.POST.get('password')
-        hashed_password = hashlib.sha256(password.encode()).hexdigest()
-
         with connection.cursor() as cursor:
             cursor.execute("""
                 SELECT u_id, u_role FROM users
-                WHERE u_email = %s AND u_password = %s
-            """, [email, hashed_password])
+                WHERE u_email = %s
+            """, [email])
             user = cursor.fetchone()
 
         if user:
@@ -51,7 +48,7 @@ def login(request):
             return redirect('verify_otp') 
 
         else:
-            messages.error(request, 'Invalid email or password.')
+            messages.error(request, 'Invalid email or email not registered')
     return render(request, 'login.html')
 
 def verify_otp(request):
@@ -60,7 +57,6 @@ def verify_otp(request):
 
     if request.method == 'POST':
         if 'resend' in request.POST:
-            # Generate new OTP
             otp = str(random.randint(100000, 999999))
             created_at = datetime.datetime.now()
             expires_at = created_at + datetime.timedelta(minutes=5)
@@ -111,15 +107,6 @@ def signup(request):
     if request.method == 'POST':
         full_name = request.POST.get('full_name')
         email = request.POST.get('email')
-        password1 = request.POST.get('password1')
-        password2 = request.POST.get('password2')
-
-        if password1 != password2:
-            messages.error(request, "Passwords do not match.")
-            return render(request, 'signup.html')
-
-        hashed_password = hashlib.sha256(password1.encode()).hexdigest()
-
         with connection.cursor() as cursor:
             cursor.execute("SELECT COUNT(*) FROM users WHERE u_email = %s", [email])
             if cursor.fetchone()[0] > 0:
@@ -128,9 +115,9 @@ def signup(request):
 
 
             cursor.execute("""
-                INSERT INTO users (u_name, u_email, u_password, u_role)
-                VALUES (%s, %s, %s, %s)
-            """, [full_name, email, hashed_password, 'users'])
+                INSERT INTO users (u_name, u_email,u_role)
+                VALUES (%s, %s, %s)
+            """, [full_name, email,'users'])
 
         messages.success(request, "Account created successfully.")
     return render(request,'signup.html')

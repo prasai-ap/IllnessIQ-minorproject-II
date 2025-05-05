@@ -24,37 +24,10 @@
         {% csrf_token %}
         <input type="text" name="full_name" placeholder="Full Name" required />
         <input type="email" name="email" placeholder="Email Address" required />
-
-        <div class="password-wrapper">
-          <input type="password" name="password1" id="password1" placeholder="Password" required />
-          <i class="fa-solid fa-eye toggle-icon" onclick="togglePassword('password1', this)"></i>
-        </div>
-
-        <div class="password-wrapper">
-          <input type="password" name="password2" id="password2" placeholder="Confirm Password" required />
-          <i class="fa-solid fa-eye toggle-icon" onclick="togglePassword('password2', this)"></i>
-        </div>
-
         <button type="submit">Sign Up</button>
       </form>
       <p class="login-link">Already have an account? <a href="{% url 'login' %}">Log In</a></p>
     </div>
   </div>
-
-  <script>
-    function togglePassword(id, el) {
-      const input = document.getElementById(id);
-      const icon = el;
-      if (input.type === "password") {
-        input.type = "text";
-        icon.classList.remove("fa-eye");
-        icon.classList.add("fa-eye-slash");
-      } else {
-        input.type = "password";
-        icon.classList.remove("fa-eye-slash");
-        icon.classList.add("fa-eye");
-      }
-    }
-  </script>
 </body>
 </html>
