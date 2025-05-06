@@ -126,3 +126,6 @@ def user_dashboard(request):
 
 def admin_dashboard(request):
     return render(request,'admin_dash.html')
+
+def diabetes_risk(request):
+    return render(request,'diabetes_risk.html')

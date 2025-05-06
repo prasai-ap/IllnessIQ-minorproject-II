@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Diabetes Prediction | IllnessIQ</title>
+  <link rel="stylesheet" href="{% static 'css/userdash.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/diabetes_form.css' %}" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="logo"><img src="{% static 'images/logo.png' %}" alt="IllnessIQ Logo"></div>
+    <div class="dropdown">
+      <button class="dropdown-toggle" id="dropdownBtn">👤</button>
+      <ul class="dropdown-menu" id="dropdownMenu">
+        <li><a href="#">History</a></li>
+        <li><a href="#">Feedback</a></li>
+        <li><a href="#">Report Issue</a></li>
+        <li><a href="#">Logout</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="diabetes-form-wrapper">
+    <h2>Diabetes Prediction</h2>
+    <form action="/predict_diabetes/" method="POST" class="diabetes-form">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Age</label>
+        <input type="number" name="Age" required>
+      </div>
+
+      <div class="form-group">
+        <label>Gender</label>
+        <select name="Gender">
+          <option>Male</option>
+          <option>Female</option>
+        </select>
+      </div>
+
+      <div class="form-group"><label>Polyuria</label><select name="Polyuria"><option>Yes</option><option>No</option></select></div>
+      <div class="form-group"><label>Polydipsia</label><select name="Polydipsia"><option>Yes</option><option>No</option></select></div>
+      <div class="form-group"><label>Sudden Weight Loss</label><select name="sudden_weight_loss"><option>Yes</option><option>No</option></select></div>
+      <div class="form-group"><label>Weakness</label><select name="weakness"><option>Yes</option><option>No</option></select></div>
+      <div class="form-group"><label>Polyphagia</label><select name="Polyphagia"><option>Yes</option><option>No</option></select></div>
+      <div class="form-group"><label>Genital Thrush</label><select name="Genital_thrush"><option>Yes</option><option>No</option></select></div>
+      <div class="form-group"><label>Visual Blurring</label><select name="visual_blurring"><option>Yes</option><option>No</option></select></div>
+      <div class="form-group"><label>Itching</label><select name="Itching"><option>Yes</option><option>No</option></select></div>
+      <div class="form-group"><label>Irritability</label><select name="Irritability"><option>Yes</option><option>No</option></select></div>
+      <div class="form-group"><label>Delayed Healing</label><select name="delayed_healing"><option>Yes</option><option>No</option></select></div>
+      <div class="form-group"><label>Partial Paresis</label><select name="partial_paresis"><option>Yes</option><option>No</option></select></div>
+      <div class="form-group"><label>Muscle Stiffness</label><select name="muscle_stiffness"><option>Yes</option><option>No</option></select></div>
+      <div class="form-group"><label>Alopecia</label><select name="Alopecia"><option>Yes</option><option>No</option></select></div>
+      <div class="form-group"><label>Obesity</label><select name="Obesity"><option>Yes</option><option>No</option></select></div>
+      <button type="submit">Predict</button>
+    </form>
+  </main>
+
+  <script>
+    const dropdownBtn = document.getElementById('dropdownBtn');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+
+    dropdownBtn.addEventListener('click', () => {
+      dropdownMenu.classList.toggle('show');
+    });
+
+    window.addEventListener('click', (e) => {
+      if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+        dropdownMenu.classList.remove('show');
+      }
+    });
+  </script>
+</body>
+</html>
