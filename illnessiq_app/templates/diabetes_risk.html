@@ -10,7 +10,6 @@
 </head>
 <body>
 
-  <!-- Navbar -->
   <nav class="navbar">
     <div class="logo">
       <img src="{% static 'images/logo.png' %}" alt="IllnessIQ Logo">
@@ -25,8 +24,6 @@
       </ul>
     </div>
   </nav>
-
-  <!-- Form Section -->
   <main class="diabetes-form-wrapper">
     <form action="/predict_diabetes/" method="POST" class="diabetes-form">
       <h2>Diabetes Prediction Insights</h2>
@@ -65,7 +62,6 @@
   </main>
 
   <!-- Dropdown Script -->
-  <script>
     const dropdownBtn = document.getElementById('dropdownBtn');
     const dropdownMenu = document.getElementById('dropdownMenu');
 
