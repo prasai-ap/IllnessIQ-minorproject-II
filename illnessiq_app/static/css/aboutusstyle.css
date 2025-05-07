@@ -12,14 +12,14 @@ body {
   color: #333;
 }
 
-/* Container */
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1rem;
 }
 
-/* NAVBAR */
+
 .navbar {
   background-color: #ffffff;
   padding: 0.5rem 0; /* smaller height */
@@ -53,7 +53,7 @@ body {
   color: #007bff;
 }
 
-/* HERO SECTION */
+
 .hero {
   background: linear-gradient(135deg, #e0f7fa, #ffffff);
   padding: 4rem 1rem;
@@ -72,7 +72,7 @@ body {
   color: #555;
 }
 
-/* SECTION TITLES */
+
 section h2 {
   font-size: 2rem;
   margin-bottom: 1rem;
@@ -85,13 +85,13 @@ section h3 {
   color: #00796b;
 }
 
-/* OVERVIEW SECTION */
+
 .overview {
   padding: 3rem 1rem;
   background-color: #ffffff;
 }
 
-/* MISSION & VALUES */
+
 .mission-values {
   background-color: #f0f4f8;
   padding: 3rem 1rem;
@@ -122,7 +122,7 @@ section h3 {
   font-size: 1rem;
 }
 
-/* TEAM SECTION */
+
 .team {
   background-color: #ffffff;
   padding: 3rem 1rem;
@@ -160,7 +160,7 @@ section h3 {
   color: #555;
 }
 
-/* FOOTER */
+
 .footer {
   background-color: #263238;
   color: #fff;
@@ -169,7 +169,7 @@ section h3 {
   font-size: 0.9rem;
 }
 
-/* Animations */
+
 .fade-in {
   opacity: 0;
   transform: translateY(20px);
@@ -183,7 +183,7 @@ section h3 {
   }
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
   .two-columns {
     flex-direction: column;

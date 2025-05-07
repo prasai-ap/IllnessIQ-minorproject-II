@@ -90,7 +90,6 @@ def verify_otp(request):
                     request.session['user_id'] = user_id
                     role = request.session.get('otp_user_role')
 
-                    # Clear OTP-related session data
                     for key in ['otp_user_id', 'otp_user_role', 'otp_user_email']:
                         request.session.pop(key, None)
 
