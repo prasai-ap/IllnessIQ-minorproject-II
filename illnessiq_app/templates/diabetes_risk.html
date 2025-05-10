@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Diabetes Prediction | IllnessIQ</title>
   <link rel="stylesheet" href="{% static 'css/diabetesrisk.css' %}" />
@@ -24,40 +24,103 @@
       </ul>
     </div>
   </nav>
+
   <main class="diabetes-form-wrapper">
     <form action="/predict_diabetes/" method="POST" class="diabetes-form">
       <h2>Diabetes Prediction Insights</h2>
       {% csrf_token %}
 
-      <div class="form-group">
-        <label for="age">Age</label>
-        <input type="number" id="age" name="Age" required>
+  
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label for="age">Age</label>
+          <input type="number" id="age" name="Age" required>
+        </div>
+
+        <div class="form-group">
+          <label for="gender">Gender</label>
+          <select id="gender" name="Gender">
+            <option>Male</option>
+            <option>Female</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="Polyuria">Do you have Polyuria (excessive urination)?</label>
+          <select id="Polyuria" name="Polyuria"><option>Yes</option><option>No</option></select>
+        </div>
+
+        <div class="form-group">
+          <label for="Polydipsia">Do you have Polydipsia (excessive thirst)?</label>
+          <select id="Polydipsia" name="Polydipsia"><option>Yes</option><option>No</option></select>
+        </div>
+
+        <div class="form-group">
+          <label for="sudden_weight_loss">Do you feel sudden weight loss?</label>
+          <select id="sudden_weight_loss" name="sudden_weight_loss"><option>Yes</option><option>No</option></select>
+        </div>
+
+        <div class="form-group">
+          <label for="weakness">Do you feel weakness?</label>
+          <select id="weakness" name="weakness"><option>Yes</option><option>No</option></select>
+        </div>
+
+        <div class="form-group">
+          <label for="Polyphagia">Do you have Polyphagia (excessive hunger)?</label>
+          <select id="Polyphagia" name="Polyphagia"><option>Yes</option><option>No</option></select>
+        </div>
+
+        <div class="form-group">
+          <label for="Genital_thrush">Do you have Genital Thrush (pain, itching, discomfort)?</label>
+          <select id="Genital_thrush" name="Genital_thrush"><option>Yes</option><option>No</option></select>
+        </div>
+
+        <div class="form-group">
+          <label for="visual_blurring">Do you have Visual Blurring?</label>
+          <select id="visual_blurring" name="visual_blurring"><option>Yes</option><option>No</option></select>
+        </div>
+
+        <div class="form-group">
+          <label for="Itching">Do you have Itching?</label>
+          <select id="Itching" name="Itching"><option>Yes</option><option>No</option></select>
+        </div>
+
+        <div class="form-group">
+          <label for="Irritability">Do you feel Irritability?</label>
+          <select id="Irritability" name="Irritability"><option>Yes</option><option>No</option></select>
+        </div>
+
+        <div class="form-group">
+          <label for="delayed_healing">Do you have Delayed Healing?</label>
+          <select id="delayed_healing" name="delayed_healing"><option>Yes</option><option>No</option></select>
+        </div>
+
+        <div class="form-group">
+          <label for="partial_paresis">Do you have Partial Paresis (muscle movement issue)?</label>
+          <select id="partial_paresis" name="partial_paresis"><option>Yes</option><option>No</option></select>
+        </div>
+
+        <div class="form-group">
+          <label for="muscle_stiffness">Do you feel Muscle Stiffness?</label>
+          <select id="muscle_stiffness" name="muscle_stiffness"><option>Yes</option><option>No</option></select>
+        </div>
+
+        <div class="form-group">
+          <label for="Alopecia">Do you have Alopecia (hair loss)?</label>
+          <select id="Alopecia" name="Alopecia"><option>Yes</option><option>No</option></select>
+        </div>
+
+        <div class="form-group">
+          <label for="Obesity">Do you have Obesity?</label>
+          <select id="Obesity" name="Obesity"><option>Yes</option><option>No</option></select>
+        </div>
+
+  
+        <button type="submit">Predict</button>
       </div>
+      
 
-      <div class="form-group">
-        <label for="gender">Gender</label>
-        <select id="gender" name="Gender">
-          <option>Male</option>
-          <option>Female</option>
-        </select>
-      </div>
-
-      <div class="form-group"><label for="Polyuria">Do you have Polyuria(excessive urination)?</label><select id="Polyuria" name="Polyuria"><option>Yes</option><option>No</option></select></div>
-      <div class="form-group"><label for="Polydipsia">Do you have Polydipsia(excessive thirst)?</label><select id="Polydipsia" name="Polydipsia"><option>Yes</option><option>No</option></select></div>
-      <div class="form-group"><label for="sudden_weight_loss">Do you feel sudden weight loss?</label><select id="sudden_weight_loss" name="sudden_weight_loss"><option>Yes</option><option>No</option></select></div>
-      <div class="form-group"><label for="weakness">Do you fell of having weakness?*</label><select id="weakness" name="weakness"><option>Yes</option><option>No</option></select></div>
-      <div class="form-group"><label for="Polyphagia">Do you have Polyphagia(excessive hunger)?*</label><select id="Polyphagia" name="Polyphagia"><option>Yes</option><option>No</option></select></div>
-      <div class="form-group"><label for="Genital_thrush">Do you have Genital Thrush(pain,itching,discomfort in genital area)?</label><select id="Genital_thrush" name="Genital_thrush"><option>Yes</option><option>No</option></select></div>
-      <div class="form-group"><label for="visual_blurring">Do you have Visual Blurring?</label><select id="visual_blurring" name="visual_blurring"><option>Yes</option><option>No</option></select></div>
-      <div class="form-group"><label for="Itching">Do you have Itching?</label><select id="Itching" name="Itching"><option>Yes</option><option>No</option></select></div>
-      <div class="form-group"><label for="Irritability">Do you feel Irritation?</label><select id="Irritability" name="Irritability"><option>Yes</option><option>No</option></select></div>
-      <div class="form-group"><label for="delayed_healing">Do you have Delayed Healing?</label><select id="delayed_healing" name="delayed_healing"><option>Yes</option><option>No</option></select></div>
-      <div class="form-group"><label for="partial_paresis">Do you have Partial Paresis(muscle movement changes)?</label><select id="partial_paresis" name="partial_paresis"><option>Yes</option><option>No</option></select></div>
-      <div class="form-group"><label for="muscle_stiffness">Do you feel Muscle Stiffness?</label><select id="muscle_stiffness" name="muscle_stiffness"><option>Yes</option><option>No</option></select></div>
-      <div class="form-group"><label for="Alopecia">Do you have Alopecia (hair loss)?</label><select id="Alopecia" name="Alopecia"><option>Yes</option><option>No</option></select></div>
-      <div class="form-group"><label for="Obesity">Do you have Obesity?</label><select id="Obesity" name="Obesity"><option>Yes</option><option>No</option></select></div>
-
-      <button type="submit">Predict</button>
     </form>
   </main>
 
