@@ -52,6 +52,9 @@ def login(request):
     return render(request, 'login.html')
 
 def verify_otp(request):
+    if not request.session.get('otp_user_id'):
+        return redirect('login')
+
     user_id = request.session.get('otp_user_id')
     email = request.session.get('otp_user_email')
 
@@ -89,10 +92,11 @@ def verify_otp(request):
 
                     request.session['user_id'] = user_id
                     role = request.session.get('otp_user_role')
+                    request.session['user_role']=role
 
                     for key in ['otp_user_id', 'otp_user_role', 'otp_user_email']:
                         request.session.pop(key, None)
-
+                        
                     return redirect('admin_dashboard' if role == 'admin' else 'user_dashboard')
                 else:
                     messages.error(request, 'Invalid or expired OTP.')
@@ -121,9 +125,13 @@ def signup(request):
     return render(request,'signup.html')
 
 def user_dashboard(request):
+    if not request.session.get('user_id'):
+        return redirect('login')
     return render(request,'user_dash.html')
 
 def admin_dashboard(request):
+    if request.session.get('user_role')!="admin":
+        return redirect('login')
     return render(request,'admin_dash.html')
 
 def diabetes_risk(request):
