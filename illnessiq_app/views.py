@@ -136,3 +136,7 @@ def admin_dashboard(request):
 
 def diabetes_risk(request):
     return render(request,'diabetes_risk.html')
+
+def logout(request):
+    request.session.flush()
+    return redirect('index')

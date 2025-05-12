@@ -18,7 +18,7 @@
           <li><a href="#">History</a></li>
           <li><a href="#">Feedback</a></li>
           <li><a href="#">Report Issue</a></li>
-          <li><a href="#">Logout</a></li>
+          <li><a href="{% url 'logout' %}">Logout</a></li>
         </ul>
     </div>
   </nav>
@@ -26,7 +26,7 @@
   <main class="dashboard">
     <h1>Welcome! Choose which risk would you like to predict:</h1>
     <div class="card-container">
-      <a href="" class="card card-diabetes">
+      <a href="{% url 'diabetes_risk' %}" class="card card-diabetes">
         <img src="{% static 'images/diabetes.jpg' %}" alt="Diabetes" />
         <p>Diabetes Prediction</p>
       </a>
