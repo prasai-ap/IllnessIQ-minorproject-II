@@ -162,9 +162,31 @@ def logout(request):
 def feedback(request):
     if not request.session.get('user_id'):
         return redirect('login')
+    
+    if request.method == 'POST':
+        rating = request.POST.get('rating')
+        description = request.POST.get('message')
+        user = request.session.get('user_id')
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                INSERT INTO feedback (f_description, u_id, rating)
+                VALUES (%s, %s, %s)
+            """, [description, user, rating])
+            messages.success(request, "Feedback Received Successfully!!!.")
     return render(request,'feedback.html')
 
 def report_issue(request):
     if not request.session.get('user_id'):
         return redirect('login')
+    
+    if request.method == 'POST':
+        issue_title = request.POST.get('issue_title')
+        description = request.POST.get('description')
+        user = request.session.get('user_id')
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                INSERT INTO issue_report (ir_name, ir_description, u_id)
+                VALUES (%s, %s, %s)
+            """, [issue_title, description, user])
+            messages.success(request, "Issue Reported!!!.")
     return render(request,'report_issue.html')

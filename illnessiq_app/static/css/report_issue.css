@@ -55,11 +55,11 @@ body {
     color: #333;
   }
   
-  .feedback-form-wrapper {
+  .issue-form-wrapper {
     padding: 40px 20px;
   }
   
-  .feedback-form {
+  .issue-form {
     background: white;
     max-width: 700px;
     margin: auto;
@@ -68,7 +68,7 @@ body {
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
   }
   
-  .feedback-form h2 {
+  .issue-form h2 {
     text-align: center;
     margin-bottom: 10px;
   }
@@ -123,3 +123,20 @@ body {
     }
   }
   
+  .messages {
+    position: absolute;
+    top: 20px;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .message {
+    display: inline-block;
+    background: #4bdbff;
+    color: #333;
+    padding: 10px 15px;
+    border-left: 5px solid #99d2f3;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-bottom: 10px;
+  }

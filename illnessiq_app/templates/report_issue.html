@@ -9,7 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-
   <nav class="navbar">
     <div class="logo">
       <a href="{% url 'user_dashboard' %}"><img src="{% static 'images/logo.png' %}" alt="IllnessIQ Logo"></a>
@@ -23,9 +22,17 @@
       </ul>
     </div>
   </nav>
+  
+  {% if messages %}
+  <div class="messages">
+    {% for message in messages %}
+      <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
 
-  <main class="feedback-form-wrapper">
-    <form action="/submit_issue/" method="POST" class="feedback-form">
+  <main class="issue-form-wrapper">
+    <form action="{%url 'report_issue' %}" method="POST" class="issue-form">
       <h2>Report an Issue</h2>
       <p class="subtext">Please provide a clear title and detailed description of the issue you've encountered while using IllnessIQ.</p>
       {% csrf_token %}

@@ -102,7 +102,7 @@ button[type="submit"]:hover {
   text-decoration: underline;
 }
 
-/* Messages */
+
 ul.messages {
   position: absolute;
   top: 20px;

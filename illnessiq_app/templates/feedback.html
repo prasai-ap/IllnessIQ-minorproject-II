@@ -25,9 +25,17 @@
       </ul>
     </div>
   </nav>
-
+  
+  {% if messages %}
+  <div class="messages">
+    {% for message in messages %}
+      <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  
   <main class="feedback-wrapper">
-    <form class="feedback-form">
+    <form action="{% url 'feedback'%}" method="POST" class="feedback-form">
       {% csrf_token %}
       <h2>We Value Your Feedback</h2>
 
