@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Report Issue | IllnessIQ</title>
+  <link rel="stylesheet" href="{% static 'css/report_issue.css' %}" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="logo">
+      <a href="{% url 'user_dashboard' %}"><img src="{% static 'images/logo.png' %}" alt="IllnessIQ Logo"></a>
+    </div>
+    <div class="dropdown">
+      <button class="dropdown-toggle" id="dropdownBtn">👤</button>
+      <ul class="dropdown-menu" id="dropdownMenu">
+        <li><a href="#">History</a></li>
+        <li><a href="{% url 'feedback' %}">Feedback</a></li>
+        <li><a href="{% url 'logout' %}">Logout</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="feedback-form-wrapper">
+    <form action="/submit_issue/" method="POST" class="feedback-form">
+      <h2>Report an Issue</h2>
+      <p class="subtext">Please provide a clear title and detailed description of the issue you've encountered while using IllnessIQ.</p>
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="issue_title">Issue Title</label>
+        <input type="text" id="issue_title" name="issue_title" placeholder="e.g., Crash on clicking Predict button" required />
+      </div>
+
+      <div class="form-group">
+        <label for="description">Issue Description</label>
+        <textarea id="description" name="description" rows="6" placeholder="Describe the issue in detail..." required></textarea>
+      </div>
+
+      <button type="submit">Submit Issue</button>
+    </form>
+  </main>
+
+  <script>
+    const dropdownBtn = document.getElementById('dropdownBtn');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+
+    dropdownBtn.addEventListener('click', () => {
+      dropdownMenu.classList.toggle('show');
+    });
+
+    window.addEventListener('click', (e) => {
+      if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+        dropdownMenu.classList.remove('show');
+      }
+    });
+  </script>
+
+</body>
+</html>

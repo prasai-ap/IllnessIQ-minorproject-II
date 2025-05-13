@@ -13,4 +13,6 @@ urlpatterns = [
     path('liver-risk/',views.liver_risk,name='liver_risk'),
     path('thyroid-risk/',views.thyroid_risk,name='thyroid_risk'),
     path('logout/',views.logout,name='logout'),
+    path('feedback/',views.feedback,name='feedback'),
+    path('report-issue/',views.report_issue,name='report_issue'),
 ]

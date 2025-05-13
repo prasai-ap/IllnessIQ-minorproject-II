@@ -158,3 +158,13 @@ def thyroid_risk(request):
 def logout(request):
     request.session.flush()
     return redirect('index')
+
+def feedback(request):
+    if not request.session.get('user_id'):
+        return redirect('login')
+    return render(request,'feedback.html')
+
+def report_issue(request):
+    if not request.session.get('user_id'):
+        return redirect('login')
+    return render(request,'report_issue.html')
