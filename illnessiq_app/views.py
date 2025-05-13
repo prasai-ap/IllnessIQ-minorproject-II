@@ -129,13 +129,31 @@ def user_dashboard(request):
         return redirect('login')
     return render(request,'user_dash.html')
 
+
 def admin_dashboard(request):
     if request.session.get('user_role')!="admin":
         return redirect('login')
     return render(request,'admin_dash.html')
 
 def diabetes_risk(request):
+    if not request.session.get('user_id'):
+        return redirect('login')
     return render(request,'diabetes_risk.html')
+
+def heart_risk(request):
+    if not request.session.get('user_id'):
+        return redirect('login')
+    return render(request,'heart_risk.html')
+
+def liver_risk(request):
+    if not request.session.get('user_id'):
+        return redirect('login')
+    return render(request,'liver_risk.html')
+
+def thyroid_risk(request):
+    if not request.session.get('user_id'):
+        return redirect('login')
+    return render(request,'thyroid_risk.html')
 
 def logout(request):
     request.session.flush()

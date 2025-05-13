@@ -9,5 +9,8 @@ urlpatterns = [
     path('user/',views.user_dashboard, name='user_dashboard'),
     path('admin/',views.admin_dashboard, name='admin_dashboard'),
     path('diabetes-risk/',views.diabetes_risk, name='diabetes_risk'),
+    path('heart-risk/',views.heart_risk, name='heart_risk'),
+    path('liver-risk/',views.liver_risk,name='liver_risk'),
+    path('thyroid-risk/',views.thyroid_risk,name='thyroid_risk'),
     path('logout/',views.logout,name='logout'),
 ]

@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Heart Risk Prediction | IllnessIQ</title>
+  <link rel="stylesheet" href="{% static 'css/heartrisk.css' %}" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="logo">
+      <a href="{% url 'user_dashboard' %}">
+        <img src="{% static 'images/logo.png' %}" alt="IllnessIQ Logo">
+      </a>
+    </div>
+    <div class="dropdown">
+      <button class="dropdown-toggle" id="dropdownBtn">👤</button>
+      <ul class="dropdown-menu" id="dropdownMenu">
+        <li><a href="#">History</a></li>
+        <li><a href="#">Feedback</a></li>
+        <li><a href="#">Report Issue</a></li>
+        <li><a href="{% url 'logout' %}">Logout</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="heart-form-wrapper">
+    <form action="/predict_heart/" method="POST" class="heart-form">
+      <h2>Heart Risk Prediction Insights</h2>
+      {% csrf_token %}
+
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label for="age">Age</label>
+          <input type="number" id="age" name="Age" required>
+        </div>
+
+        <div class="form-group">
+          <label for="gender">Gender</label>
+          <select id="gender" name="Gender">
+            <option>Male</option>
+            <option>Female</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="heart_rate">Heart Rate (bpm)</label>
+          <input type="number" id="heart_rate" name="Heart_Rate" required>
+        </div>
+
+        <div class="form-group">
+          <label for="sbp">Systolic Blood Pressure (mm Hg)</label>
+          <input type="number" id="sbp" name="Systolic_BP" required>
+        </div>
+
+        <div class="form-group">
+          <label for="dbp">Diastolic Blood Pressure (mm Hg)</label>
+          <input type="number" id="dbp" name="Diastolic_BP" required>
+        </div>
+
+        <div class="form-group">
+          <label for="blood_sugar">Blood Sugar (mg/dL)</label>
+          <input type="number" id="blood_sugar" name="Blood_Sugar" required>
+        </div>
+
+        <div class="form-group">
+          <label for="ckmb">CK-MB (ng/mL)</label>
+          <input type="number" step="0.01" id="ckmb" name="CK_MB" required>
+        </div>
+
+        <div class="form-group">
+          <label for="troponin">Troponin (ng/mL)</label>
+          <input type="number" step="0.01" id="troponin" name="Troponin" required>
+        </div>
+
+        <button type="submit">Predict</button>
+      </div>
+
+    </form>
+  </main>
+
+  <script>
+    const dropdownBtn = document.getElementById('dropdownBtn');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+
+    dropdownBtn.addEventListener('click', () => {
+      dropdownMenu.classList.toggle('show');
+    });
+
+    window.addEventListener('click', (e) => {
+      if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+        dropdownMenu.classList.remove('show');
+      }
+    });
+  </script>
+
+</body>
+</html>
