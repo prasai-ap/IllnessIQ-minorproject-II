@@ -1,4 +1,4 @@
-/* Base Reset */
+/* Reset and font */
 * {
   margin: 0;
   padding: 0;
@@ -8,175 +8,188 @@
 body {
   font-family: 'Inter', sans-serif;
   line-height: 1.6;
-  background-color: #f9fafb;
+  background-color: #f9f9f9;
   color: #333;
 }
 
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
-}
-
-
 .navbar {
-  background-color: #ffffff;
-  padding: 0.5rem 0; /* smaller height */
-  border-bottom: 1px solid #e0e0e0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  position: sticky;
-  top: 0;
-  z-index: 999;
+  background-color: #005792;
+  padding: 1rem 0;
 }
 
 .navbar .container {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .navbar .logo img {
-  height: 40px;
+  height: 50px;
 }
 
 .navbar .nav-links a {
-  margin-left: 1.5rem;
+  color: #fff;
   text-decoration: none;
-  color: #333;
   font-weight: 600;
-  font-size: 0.95rem;
-  transition: color 0.3s ease;
+  margin-left: 1rem;
 }
 
 .navbar .nav-links a:hover {
-  color: #007bff;
+  text-decoration: underline;
 }
 
 
 .hero {
-  background: linear-gradient(135deg, #e0f7fa, #ffffff);
-  padding: 4rem 1rem;
+  background: linear-gradient(to right, #0078aa, #00b4d8);
+  color: #fff;
+  padding: 3rem 1rem;
   text-align: center;
 }
 
 .hero h1 {
   font-size: 2.5rem;
-  font-weight: 700;
   margin-bottom: 1rem;
-  color: #004d40;
 }
 
 .hero p {
   font-size: 1.2rem;
-  color: #555;
 }
 
-
-section h2 {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-  color: #212121;
-}
-
-section h3 {
-  font-size: 1.5rem;
-  margin-bottom: 0.8rem;
-  color: #00796b;
-}
-
-
+/* Overview */
 .overview {
   padding: 3rem 1rem;
-  background-color: #ffffff;
+  background-color: #fff;
+  text-align: center;
+}
+
+.overview h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.overview p {
+  max-width: 800px;
+  margin: 0 auto;
+  font-size: 1rem;
+  line-height: 1.7;
 }
 
 
 .mission-values {
-  background-color: #f0f4f8;
   padding: 3rem 1rem;
+  background-color: #e9f5fb;
 }
 
 .two-columns {
   display: flex;
   flex-wrap: wrap;
   gap: 2rem;
+  justify-content: center;
 }
 
 .card {
-  background: #ffffff;
-  padding: 1.5rem;
-  border-radius: 1rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 2rem;
   flex: 1;
   min-width: 280px;
+  max-width: 500px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .card ul {
-  list-style: none;
+  list-style-type: none;
   padding-left: 0;
 }
 
-.card li {
-  margin-bottom: 0.5rem;
-  font-size: 1rem;
+.card ul li {
+  margin: 0.5rem 0;
 }
 
 
 .team {
-  background-color: #ffffff;
   padding: 3rem 1rem;
   text-align: center;
+}
+
+.team h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
 }
 
 .team-grid {
   display: flex;
   justify-content: center;
-  flex-wrap: wrap;
   gap: 2rem;
-  margin-top: 2rem;
+  flex-wrap: wrap;
 }
 
 .member {
-  max-width: 320px;
-  text-align: left;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 2rem;
+  width: 300px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transition: transform 0.3s ease;
+}
+
+.member:hover {
+  transform: translateY(-5px);
 }
 
 .profile-img {
-  width: 100%;
-  border-radius: 1rem;
-  margin-bottom: 1rem;
+  width: 120px;
+  height: 120px;
   object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  border: 3px solid #0078aa;
 }
 
-.role {
-  font-weight: 600;
-  color: #00796b;
+.member h4 {
+  font-size: 1.3rem;
   margin-bottom: 0.5rem;
+  color: #0078aa;
 }
 
-.bio {
-  font-size: 0.95rem;
+.member .role {
+  font-weight: 600;
   color: #555;
+  margin-bottom: 1rem;
+}
+
+.member .bio {
+  font-size: 0.95rem;
+  line-height: 1.6;
 }
 
 
 .footer {
-  background-color: #263238;
+  background-color: #003f5c;
   color: #fff;
-  padding: 1rem 0;
   text-align: center;
+  padding: 1rem 0;
   font-size: 0.9rem;
 }
 
 
 .fade-in {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeIn 1s ease-in-out forwards;
+  animation: fadeInUp 1s ease-in-out both;
 }
 
-@keyframes fadeIn {
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
   to {
     opacity: 1;
     transform: translateY(0);
@@ -187,6 +200,11 @@ section h3 {
 @media (max-width: 768px) {
   .two-columns {
     flex-direction: column;
+    align-items: center;
+  }
+
+  .member {
+    width: 90%;
   }
 
   .hero h1 {
@@ -195,10 +213,5 @@ section h3 {
 
   .hero p {
     font-size: 1rem;
-  }
-
-  .navbar .nav-links a {
-    margin-left: 1rem;
-    font-size: 0.9rem;
   }
 }
