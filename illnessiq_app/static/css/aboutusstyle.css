@@ -13,7 +13,7 @@ body {
 }
 
 .navbar {
-  background-color: #005792;
+  background-color: #ffffff;
   padding: 1rem 0;
 }
 
@@ -31,7 +31,7 @@ body {
 }
 
 .navbar .nav-links a {
-  color: #fff;
+  color: #000000;
   text-decoration: none;
   font-weight: 600;
   margin-left: 1rem;
@@ -43,8 +43,8 @@ body {
 
 
 .hero {
-  background: linear-gradient(to right, #0078aa, #00b4d8);
-  color: #fff;
+  background: linear-gradient(to right, #4b91d6, #a7b2e8);
+  color: #000000;
   padding: 3rem 1rem;
   text-align: center;
 }
@@ -173,8 +173,8 @@ body {
 
 
 .footer {
-  background-color: #003f5c;
-  color: #fff;
+  background-color: #8dd1f1;
+  color: #000000;
   text-align: center;
   padding: 1rem 0;
   font-size: 0.9rem;
