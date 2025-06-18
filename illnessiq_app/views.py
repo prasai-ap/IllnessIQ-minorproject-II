@@ -110,11 +110,13 @@ def signup(request):
         subject = 'Welcome To IllnessIQ'
         message = f'''Dear {full_name},
         Welcome to IllnessIQ – your personal companion for better health insights. We’re thrilled to have you on board. With IllnessIQ, you can:
+        
         - Check your risk for common illnesses like diabetes, liver, heart, and thyroid problems.
         - Get AI-based recommendations for health improvements.
         - Track your medical history and wellness goals easily.
         
         Feel free to explore and take control of your health today!
+        
         Best regards,  
         The IllnessIQ Team'''
         email_from = settings.EMAIL_HOST_USER
