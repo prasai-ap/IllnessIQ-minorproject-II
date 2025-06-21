@@ -13,21 +13,21 @@ def aboutus(request):
     return render(request,'aboutus.html')
 
 def send_otp_email(user_email, otp):
-    with connetion.cursor() as cursor:
+    with connection.cursor() as cursor:
         cursor.execute("SELECT u_name FROM users WHERE u_email = %s",[user_email])
-    result = cursor.fetchone()
-    if result:
-        user_name=result[0]
-    subject = 'Your OTP for IllnessIQ Login'
-    message = f'''Dear {user_name},\n\nYour OTP code is: {otp}. It is valid for 5 minutes.\n\n'''
-    email_from = settings.EMAIL_HOST_USER
-    send_mail(subject, message, email_from, [user_email])
+        result = cursor.fetchone()
+        if result:
+            user_name=result[0]
+        subject = 'Your OTP for IllnessIQ Login'
+        message = f'''Dear {user_name},\n\nYour OTP code is: {otp}. It is valid for 5 minutes.\n\n'''
+        email_from = settings.EMAIL_HOST_USER
+        send_mail(subject, message, email_from, [user_email])
 
 def login(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         with connection.cursor() as cursor:
-            cursor.execute("SELECT u_id, u_role FROM usersWHERE u_email = %s", [email])
+            cursor.execute("SELECT u_id, u_role FROM users WHERE u_email = %s", [email])
             user = cursor.fetchone()
 
         if user:
