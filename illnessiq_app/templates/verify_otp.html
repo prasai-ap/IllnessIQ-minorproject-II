@@ -2,8 +2,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>OTP Verification – IllnessIQ</title>
-  <link rel="stylesheet" href="{% static 'css/loginstyle.css' %}">
+  <link rel="stylesheet" href="{% static 'css/otpstyle.css' %}">
 </head>
 <body>
   <div class="login-container">
@@ -11,17 +12,24 @@
       <h2>Enter OTP</h2>
       <form method="POST">
         {% csrf_token %}
-        <label for="otp">OTP Code</label>
-        <input type="text" name="otp" id="otp" maxlength="6" required />
+        <div class="otp-input-container">
+          <input type="text" maxlength="1" class="otp-input" />
+          <input type="text" maxlength="1" class="otp-input" />
+          <input type="text" maxlength="1" class="otp-input" />
+          <input type="text" maxlength="1" class="otp-input" />
+          <input type="text" maxlength="1" class="otp-input" />
+          <input type="text" maxlength="1" class="otp-input" />
+        </div>
+        <input type="hidden" name="otp" id="otp" required />
         <button type="submit" name="verify_btn" class="btn-login">Verify OTP</button>
       </form>
-      
+
       <form method="POST" style="margin-top: 10px;">
         {% csrf_token %}
         <input type="hidden" name="resend" value="1" />
         <button type="submit" class="btn-login">Resend OTP</button>
       </form>
-      
+
       {% if messages %}
         {% for message in messages %}
           <p class="{{ message.tags }}">{{ message }}</p>
@@ -29,5 +37,25 @@
       {% endif %}
     </div>
   </div>
+
+  <script>
+    const inputs = document.querySelectorAll('.otp-input');
+    const hiddenOtp = document.getElementById('otp');
+
+    inputs.forEach((input, index) => {
+      input.addEventListener('input', () => {
+        if (input.value.length === 1 && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+        hiddenOtp.value = Array.from(inputs).map(i => i.value).join('');
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && input.value === '' && index > 0) {
+          inputs[index - 1].focus();
+        }
+      });
+    });
+  </script>
 </body>
 </html>
