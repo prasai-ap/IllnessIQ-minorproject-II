@@ -41,9 +41,24 @@
 
         <div class="form-group">
           <label for="gender">Gender</label>
-          <select id="gender" name="Gender">
+          <select id="gender" name="Gender" required>
+            <option value="">-- Select Gender --</option>
             <option>Male</option>
             <option>Female</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="cholesterol">Cholesterol Level (mg/dL)</label>
+          <input type="number" id="cholesterol" name="Cholesterol" required>
+        </div>
+
+        <div class="form-group">
+          <label for="fasting_blood_sugar">High Fasting Blood Sugar (&gt; 120 mg/dL)?</label>
+          <select id="fasting_blood_sugar" name="Fasting_Blood_Sugar" required>
+            <option value="">-- Select Option --</option>
+            <option>Yes</option>
+            <option>No</option>
           </select>
         </div>
 
@@ -52,34 +67,8 @@
           <input type="number" id="heart_rate" name="Heart_Rate" required>
         </div>
 
-        <div class="form-group">
-          <label for="sbp">Systolic Blood Pressure (mm Hg)</label>
-          <input type="number" id="sbp" name="Systolic_BP" required>
-        </div>
-
-        <div class="form-group">
-          <label for="dbp">Diastolic Blood Pressure (mm Hg)</label>
-          <input type="number" id="dbp" name="Diastolic_BP" required>
-        </div>
-
-        <div class="form-group">
-          <label for="blood_sugar">Blood Sugar (mg/dL)</label>
-          <input type="number" id="blood_sugar" name="Blood_Sugar" required>
-        </div>
-
-        <div class="form-group">
-          <label for="ckmb">CK-MB (ng/mL)</label>
-          <input type="number" step="0.01" id="ckmb" name="CK_MB" required>
-        </div>
-
-        <div class="form-group">
-          <label for="troponin">Troponin (ng/mL)</label>
-          <input type="number" step="0.01" id="troponin" name="Troponin" required>
-        </div>
-
         <button type="submit">Predict</button>
       </div>
-
     </form>
   </main>
 
