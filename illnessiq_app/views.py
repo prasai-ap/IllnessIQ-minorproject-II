@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect
-from django.db import connection
+from django.db import connection ,IntegrityError
 from django.contrib import messages
+from django.http import JsonResponse
 import random ,datetime
 from django.core.mail import send_mail
 from django.conf import settings
@@ -163,14 +164,26 @@ def feedback(request):
         return redirect('login')
     
     if request.method == 'POST':
-        rating = request.POST.get('rating')
-        description = request.POST.get('message')
-        user = request.session.get('user_id')
-        with connection.cursor() as cursor:
-            cursor.execute("INSERT INTO feedback (f_description, u_id, rating) VALUES (%s, %s, %s)", [description, user, rating])
-        messages.success(request, "Feedback Received Successfully!!!.")
-    return render(request,'feedback.html')
+        rating = request.POST.get('rating', '').strip()
+        description = request.POST.get('message', '').strip()
+        user_id = request.session.get('user_id')
+        if not rating or not description:
+            messages.error(request, "All fields are required.")
+            return redirect('feedback')
 
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    INSERT INTO feedback (f_description, u_id, rating)
+                    VALUES (%s, %s, %s)
+                """, [description, user_id, rating])
+            messages.success(request, "Feedback Received Successfully!")
+            return redirect('feedback')
+        except IntegrityError:
+            messages.error(request, "An error occurred while submitting your feedback.")
+            return redirect('feedback')
+
+    return render(request, 'feedback.html')
 def report_issue(request):
     if not request.session.get('user_id'):
         return redirect('login')

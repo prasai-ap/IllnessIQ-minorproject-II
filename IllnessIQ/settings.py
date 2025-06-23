@@ -88,7 +88,7 @@ EMAIL_HOST_PASSWORD = 'vgzmtgeehgllvtix'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "mydb",
+        "NAME": "illnessiq",
         "USER": "postgres",
         "PASSWORD": "root",
         "HOST": "localhost",
