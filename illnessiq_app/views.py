@@ -201,7 +201,7 @@ def report_issue(request):
     return render(request,'report_issue.html')
 
 
-diabetes_model = os.path.join(settings.BASE_DIR, 'illnessiq_app', 'ml_models', 'diabetes_xgboost_model.pkl')
+diabetes_model = os.path.join(settings.BASE_DIR, 'illnessiq_app', 'ml_models', 'diabetes_model.pkl')
 
 gender_map = {'Male': 1, 'Female': 0}
 hypertension_map = {'Yes': 1, 'No': 0}
