@@ -221,7 +221,6 @@ def predict_diabetes(request):
             hba1c = float(request.POST.get('HbA1c_Level'))
             glucose = float(request.POST.get('Blood_Glucose_Level'))
 
-            # Correct input structure and column order
             raw_data = {
                 'age': age,
                 'gender': gender,
