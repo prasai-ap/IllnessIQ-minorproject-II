@@ -15,4 +15,5 @@ urlpatterns = [
     path('logout/',views.logout,name='logout'),
     path('feedback/',views.feedback,name='feedback'),
     path('report-issue/',views.report_issue,name='report_issue'),
+    path('predict_diabetes/', views.predict_diabetes, name='predict_diabetes'),
 ]

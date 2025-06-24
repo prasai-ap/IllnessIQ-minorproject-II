@@ -6,6 +6,9 @@ import random ,datetime
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
+import os
+import joblib
+import pandas as pd
 
 def index(request):
     return render(request,'index.html')
@@ -196,3 +199,51 @@ def report_issue(request):
             cursor.execute("INSERT INTO issue_report (ir_name, ir_description, u_id) VALUES (%s, %s, %s)", [issue_title, description, user])
         messages.success(request, "Issue Reported!!!.")
     return render(request,'report_issue.html')
+
+
+diabetes_model = os.path.join(settings.BASE_DIR, 'illnessiq_app', 'ml_models', 'diabetes_xgboost_model.pkl')
+
+gender_map = {'Male': 1, 'Female': 0}
+hypertension_map = {'Yes': 1, 'No': 0}
+heart_disease_map = {'Yes': 1, 'No': 0}
+smoking_map = {'Never': 0, 'Former': 1, 'Current': 2}
+
+def predict_diabetes(request):
+    model = joblib.load(diabetes_model)
+    if request.method == 'POST':
+        try:
+            age = int(request.POST.get('Age'))
+            gender = gender_map.get(request.POST.get('Gender'), -1)
+            hypertension = hypertension_map.get(request.POST.get('Hypertension'), -1)
+            heart_disease = heart_disease_map.get(request.POST.get('Heart_Disease'), -1)
+            smoking_status = smoking_map.get(request.POST.get('Smoking_Status'), -1)
+            bmi = float(request.POST.get('BMI'))
+            hba1c = float(request.POST.get('HbA1c_Level'))
+            glucose = float(request.POST.get('Blood_Glucose_Level'))
+
+            # Correct input structure and column order
+            raw_data = {
+                'age': age,
+                'gender': gender,
+                'hypertension': hypertension,
+                'heart_disease': heart_disease,
+                'smoking_history': smoking_status,
+                'bmi': bmi,
+                'HbA1c_level': hba1c,
+                'blood_glucose_level': glucose
+            }
+
+            feature_order = [
+                'gender', 'age', 'hypertension', 'heart_disease',
+                'smoking_history', 'bmi', 'HbA1c_level', 'blood_glucose_level'
+            ]
+
+            input_data = pd.DataFrame([raw_data])[feature_order]
+
+            prediction = model.predict(input_data)[0]
+            result = "You have High Risk of Diabetes" if prediction == 1 else "You Have Low Risk of Diabetes"
+
+            return render(request, 'diabetes_risk_result.html', {'result': result})
+        
+        except Exception as e:
+            return render(request, 'diabetes_risk_result.html', {'result': f"Error: {str(e)}"})
