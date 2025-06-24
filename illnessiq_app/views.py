@@ -209,40 +209,59 @@ heart_disease_map = {'Yes': 1, 'No': 0}
 smoking_map = {'Never': 0, 'Former': 1, 'Current': 2}
 
 def predict_diabetes(request):
+    if not request.session.get('user_id'):
+        return redirect('login')
+    
     model = joblib.load(diabetes_model)
+    
+    user=request.session.get('user_id')
+
     if request.method == 'POST':
         try:
             age = int(request.POST.get('Age'))
-            gender = gender_map.get(request.POST.get('Gender'), -1)
-            hypertension = hypertension_map.get(request.POST.get('Hypertension'), -1)
-            heart_disease = heart_disease_map.get(request.POST.get('Heart_Disease'), -1)
-            smoking_status = smoking_map.get(request.POST.get('Smoking_Status'), -1)
+            gender = request.POST.get('Gender')
+            hypertension = request.POST.get('Hypertension')
+            heart_disease = request.POST.get('Heart_Disease')
+            smoking_status = request.POST.get('Smoking_Status')
             bmi = float(request.POST.get('BMI'))
             hba1c = float(request.POST.get('HbA1c_Level'))
             glucose = float(request.POST.get('Blood_Glucose_Level'))
 
-            raw_data = {
+            input_data = pd.DataFrame([{
                 'age': age,
-                'gender': gender,
-                'hypertension': hypertension,
-                'heart_disease': heart_disease,
-                'smoking_history': smoking_status,
+                'gender': gender_map.get(gender),
+                'hypertension': hypertension_map.get(hypertension),
+                'heart_disease': heart_disease_map.get(heart_disease),
+                'smoking_history': smoking_map.get(smoking_status),
                 'bmi': bmi,
                 'HbA1c_level': hba1c,
                 'blood_glucose_level': glucose
-            }
-
-            feature_order = [
+            }])[[
                 'gender', 'age', 'hypertension', 'heart_disease',
                 'smoking_history', 'bmi', 'HbA1c_level', 'blood_glucose_level'
-            ]
-
-            input_data = pd.DataFrame([raw_data])[feature_order]
+            ]]
 
             prediction = model.predict(input_data)[0]
-            result = "You have High Risk of Diabetes" if prediction == 1 else "You Have Low Risk of Diabetes"
+            result = "High Risk" if prediction == 1 else "Low Risk"
+            
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    INSERT INTO diabetes_medical_details 
+                    (u_id, age, gender, hypertension, heart_diseases, smoking_history, bmi, hba1c, blood_glucose)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING d_id
+                """, [
+                    user, age, gender, hypertension, heart_disease,
+                    smoking_status, bmi, hba1c, glucose
+                ])
+                d_id = cursor.fetchone()[0]
 
-            return render(request, 'diabetes_risk_result.html', {'result': result})
+                cursor.execute("""
+                    INSERT INTO diabetes_risk (risk_status, d_id)
+                    VALUES (%s, %s) RETURNING dr_id
+                """, [result, d_id])
+                dr_id = cursor.fetchone()[0]
+                
+                return render(request, 'diabetes_risk_result.html', {'result': result})
         
         except Exception as e:
             return render(request, 'diabetes_risk_result.html', {'result': f"Error: {str(e)}"})
