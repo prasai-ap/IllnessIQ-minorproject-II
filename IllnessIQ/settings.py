@@ -143,3 +143,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #session handling
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
+
+#Gemini API Connection
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")

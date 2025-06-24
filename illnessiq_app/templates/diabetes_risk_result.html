@@ -6,6 +6,21 @@
 <body>
   <h2>Prediction Result:</h2>
   <p>{{ result }}</p>
+
+  {% if recommendations %}
+    <h3>Health Recommendations:</h3>
+    {% for category, descs in recommendations.items %}
+      <h4>{{ category }}</h4>
+      <ul>
+        {% for desc in descs %}
+          <li>{{ desc }}</li>
+        {% endfor %}
+      </ul>
+    {% endfor %}
+  {% else %}
+    <p>No recommendations available.</p>
+  {% endif %}
+
   <a href="{% url 'predict_diabetes' %}">Back to Prediction Form</a>
 </body>
 </html>

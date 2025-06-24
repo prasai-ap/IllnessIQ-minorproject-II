@@ -9,6 +9,7 @@ from django.utils import timezone
 import os
 import joblib
 import pandas as pd
+import google.generativeai as genai
 
 def index(request):
     return render(request,'index.html')
@@ -261,7 +262,41 @@ def predict_diabetes(request):
                 """, [result, d_id])
                 dr_id = cursor.fetchone()[0]
                 
-                return render(request, 'diabetes_risk_result.html', {'result': result})
-        
+            prompt = f"""Provide personalized health recommendations for a {gender.lower()} aged {age} with {result} of diabetes.
+            BMI = {bmi}, HbA1c = {hba1c}, Glucose = {glucose}, Smoking = {smoking_status}, Hypertension = {hypertension}, Heart Disease = {heart_disease}.
+            Return them grouped into categories like Diet, Lifestyle, Medical Advice with each recommendation in a new line using '-' bullet points.
+            """
+
+            model_gemini = genai.GenerativeModel('gemini-2.5-flash')
+            response = model_gemini.generate_content(prompt)
+            gemini_text = response.text
+
+            recommendations = {}
+            current_cat = None
+            for line in gemini_text.splitlines():
+                line = line.strip()
+                if line.endswith(':'):
+                    current_cat = line[:-1]
+                    recommendations[current_cat] = []
+                elif current_cat and line.startswith('-'):
+                    recommendations[current_cat].append(line[1:].strip())
+            if not recommendations:
+                recommendations["General"] = [gemini_text.strip()]
+
+            with connection.cursor() as cursor:
+                cursor.execute("INSERT INTO diabetes_recommendation (dr_id) VALUES (%s) RETURNING dre_id", [dr_id])
+                dre_id = cursor.fetchone()[0]
+
+                for category, descs in recommendations.items():
+                    cursor.execute("INSERT INTO diabetesrec_category (category, dre_id) VALUES (%s, %s) RETURNING drc_id", [category, dre_id])
+                    drc_id = cursor.fetchone()[0]
+                    for desc in descs:
+                        cursor.execute("INSERT INTO diabetesrec_description (description, drc_id) VALUES (%s, %s)", [desc, drc_id])
+
+            return render(request, 'diabetes_risk_result.html', {
+                'result': result,
+                'recommendations': recommendations
+            })
+
         except Exception as e:
             return render(request, 'diabetes_risk_result.html', {'result': f"Error: {str(e)}"})
