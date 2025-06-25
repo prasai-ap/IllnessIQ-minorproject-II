@@ -6,7 +6,7 @@
 
 body {
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(to right, #43cea2, #185a9d);
+  background: linear-gradient(to right, #74ebd5, #ACB6E5); /* Softer healthcare gradient */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -21,10 +21,10 @@ body {
 
 .message {
   display: inline-block;
-  background: #fff3cd;
-  color: #333;
+  background: #e3f2fd;
+  color: #0d47a1;
   padding: 10px 15px;
-  border-left: 5px solid #ffc107;
+  border-left: 5px solid #2196f3;
   border-radius: 6px;
   font-size: 14px;
   margin-bottom: 10px;
@@ -40,11 +40,11 @@ body {
 }
 
 .login-box {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(15px);
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px);
   padding: 35px;
-  border-radius: 18px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
   text-align: center;
   color: #fff;
   width: 100%;
@@ -63,7 +63,7 @@ h2 {
   margin-bottom: 25px;
   font-weight: 600;
   font-size: 24px;
-  color: #fff;
+  color: #ffffff;
 }
 
 .login-box input[type="email"],
@@ -73,21 +73,21 @@ h2 {
   margin: 12px 0;
   border: none;
   border-radius: 12px;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.25);
   color: #fff;
   font-size: 15px;
   outline: none;
 }
 
 .login-box input::placeholder {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .btn-login {
   width: 100%;
   padding: 14px;
   background-color: #ffffff;
-  color: #333;
+  color: #0d47a1;
   border: none;
   border-radius: 12px;
   font-size: 16px;
@@ -98,16 +98,16 @@ h2 {
 }
 
 .btn-login:hover {
-  background-color: #e6e6e6;
+  background-color: #f0f0f0;
 }
 
 .signup-text {
   margin-top: 20px;
-  color: #fff;
+  color: #ffffff;
 }
 
 .signup-text a {
-  color: #ffdd57;
+  color: #ffeb3b;
   text-decoration: none;
   font-weight: 500;
 }

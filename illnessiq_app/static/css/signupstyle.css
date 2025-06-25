@@ -1,30 +1,33 @@
-
 body {
   margin: 0;
   padding: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(to right, #74ebd5, #9face6);
+  background: linear-gradient(to right, #74ebd5, #ACB6E5);
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-
+/* Center container */
 .signup-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
-  max-width: 420px;
+  max-width: 460px;
   padding: 20px;
+  box-sizing: border-box;
 }
-
 
 .form-box {
   background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(12px);
-  border-radius: 18px;
+  backdrop-filter: blur(15px);
+  border-radius: 20px;
   padding: 35px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
   color: #fff;
+  width: 100%;
 }
 
 .form-box h2 {
@@ -34,23 +37,21 @@ body {
   color: #fff;
 }
 
-
 .form-box input {
   width: 100%;
   padding: 12px 16px;
   margin: 12px 0;
   border: none;
   border-radius: 12px;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.25);
   color: #fff;
   font-size: 15px;
   outline: none;
 }
 
 .form-box input::placeholder {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.8);
 }
-
 
 .password-wrapper {
   position: relative;
@@ -66,12 +67,11 @@ body {
   font-size: 18px;
 }
 
-
 button[type="submit"] {
   width: 100%;
   padding: 14px;
   background-color: #ffffff;
-  color: #333;
+  color: #0d47a1;
   border: none;
   border-radius: 12px;
   font-size: 16px;
@@ -82,18 +82,18 @@ button[type="submit"] {
 }
 
 button[type="submit"]:hover {
-  background-color: #eee;
+  background-color: #f0f0f0;
 }
 
 /* Login Link */
 .login-link {
   text-align: center;
   margin-top: 20px;
-  color: #fff;
+  color: #ffffff;
 }
 
 .login-link a {
-  color: #ffd369;
+  color: #ffeb3b;
   text-decoration: none;
   font-weight: 500;
 }
@@ -101,7 +101,6 @@ button[type="submit"]:hover {
 .login-link a:hover {
   text-decoration: underline;
 }
-
 
 ul.messages {
   position: absolute;
@@ -115,11 +114,11 @@ ul.messages {
 }
 
 ul.messages li {
-  background: #fff3cd;
-  color: #333;
+  background: #e3f2fd;
+  color: #0d47a1;
   padding: 10px 15px;
   margin-bottom: 10px;
-  border-left: 5px solid #ffc107;
+  border-left: 5px solid #2196f3;
   border-radius: 6px;
   font-size: 14px;
 }

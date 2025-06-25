@@ -9,6 +9,8 @@ from django.utils import timezone
 import os
 import joblib
 import pandas as pd
+import json
+import markdown #
 import google.generativeai as genai
 
 def index(request):
@@ -212,10 +214,21 @@ smoking_map = {'Never': 0, 'Former': 1, 'Current': 2}
 def predict_diabetes(request):
     if not request.session.get('user_id'):
         return redirect('login')
-    
-    model = joblib.load(diabetes_model)
-    
-    user=request.session.get('user_id')
+
+    try:
+        model = joblib.load(diabetes_model)
+    except FileNotFoundError:
+        return render(request, 'diabetes_risk_result.html', {
+            'result': "Error: Prediction model file not found.",
+            'recommendation_html': "<p>Please contact support regarding a system configuration error.</p>"
+        })
+    except Exception as e:
+        return render(request, 'diabetes_risk_result.html', {
+            'result': f"Error loading prediction model: {str(e)}",
+            'recommendation_html': "<p>Please contact support regarding a system configuration error.</p>"
+        })
+
+    user = request.session.get('user_id')
 
     if request.method == 'POST':
         try:
@@ -228,7 +241,12 @@ def predict_diabetes(request):
             hba1c = float(request.POST.get('HbA1c_Level'))
             glucose = float(request.POST.get('Blood_Glucose_Level'))
 
-            input_data = pd.DataFrame([{
+            model_features = [
+                'gender', 'age', 'hypertension', 'heart_disease',
+                'smoking_history', 'bmi', 'HbA1c_level', 'blood_glucose_level'
+            ]
+
+            input_values = {
                 'age': age,
                 'gender': gender_map.get(gender),
                 'hypertension': hypertension_map.get(hypertension),
@@ -237,10 +255,9 @@ def predict_diabetes(request):
                 'bmi': bmi,
                 'HbA1c_level': hba1c,
                 'blood_glucose_level': glucose
-            }])[[
-                'gender', 'age', 'hypertension', 'heart_disease',
-                'smoking_history', 'bmi', 'HbA1c_level', 'blood_glucose_level'
-            ]]
+            }
+
+            input_data = pd.DataFrame([input_values], columns=model_features)
 
             prediction = model.predict(input_data)[0]
             result = "High Risk" if prediction == 1 else "Low Risk"
@@ -262,41 +279,43 @@ def predict_diabetes(request):
                 """, [result, d_id])
                 dr_id = cursor.fetchone()[0]
                 
-            prompt = f"""Provide personalized health recommendations for a {gender.lower()} aged {age} with {result} of diabetes.
-            BMI = {bmi}, HbA1c = {hba1c}, Glucose = {glucose}, Smoking = {smoking_status}, Hypertension = {hypertension}, Heart Disease = {heart_disease}.
-            Return them grouped into categories like Diet, Lifestyle, Medical Advice with each recommendation in a new line using '-' bullet points.
+            prompt = f"""Based on the following user data, provide personalized health recommendations for diabetes risk management.
+            The user is a {gender.lower()} aged {age} with a {result} of diabetes.
+            Key metrics: BMI = {bmi}, HbA1c = {hba1c}, Blood Glucose = {glucose}.
+            Health history: Smoking Status = {smoking_status}, Hypertension = {hypertension}, Heart Disease = {heart_disease}.
+
+            Structure your response with clear headings for categories like "Summary of Risk", "Lifestyle Recommendations", "Dietary Advice", and "Medical Considerations".
+            Use bullet points for individual recommendations within each category.
+            Start directly with the recommendations, no introductory sentences before the first heading.
             """
 
             model_gemini = genai.GenerativeModel('gemini-2.5-flash')
             response = model_gemini.generate_content(prompt)
-            gemini_text = response.text
-
-            recommendations = {}
-            current_cat = None
-            for line in gemini_text.splitlines():
-                line = line.strip()
-                if line.endswith(':'):
-                    current_cat = line[:-1]
-                    recommendations[current_cat] = []
-                elif current_cat and line.startswith('-'):
-                    recommendations[current_cat].append(line[1:].strip())
-            if not recommendations:
-                recommendations["General"] = [gemini_text.strip()]
+            recommendation_text = response.text.strip()
+            
+            recommendation_html = markdown.markdown(recommendation_text)
 
             with connection.cursor() as cursor:
-                cursor.execute("INSERT INTO diabetes_recommendation (dr_id) VALUES (%s) RETURNING dre_id", [dr_id])
+                cursor.execute("""
+                    INSERT INTO diabetes_recommendation (dr_id, recommendation)
+                    VALUES (%s, %s) RETURNING dre_id
+                """, [dr_id, recommendation_text])
                 dre_id = cursor.fetchone()[0]
-
-                for category, descs in recommendations.items():
-                    cursor.execute("INSERT INTO diabetesrec_category (category, dre_id) VALUES (%s, %s) RETURNING drc_id", [category, dre_id])
-                    drc_id = cursor.fetchone()[0]
-                    for desc in descs:
-                        cursor.execute("INSERT INTO diabetesrec_description (description, drc_id) VALUES (%s, %s)", [desc, drc_id])
 
             return render(request, 'diabetes_risk_result.html', {
                 'result': result,
-                'recommendations': recommendations
+                'recommendation_html': recommendation_html
             })
 
+        except ValueError as ve:
+            return render(request, 'diabetes_risk_result.html', {
+                'result': f"Error: Invalid input data. Please ensure all fields are correctly filled. Details: {str(ve)}",
+                'recommendation_html': "<p>Please check your input values and try again.</p>"
+            })
         except Exception as e:
-            return render(request, 'diabetes_risk_result.html', {'result': f"Error: {str(e)}"})
+            return render(request, 'diabetes_risk_result.html', {
+                'result': f"An unexpected error occurred during prediction: {str(e)}",
+                'recommendation_html': "<p>An unexpected issue occurred. Please try again later or contact support.</p>"
+            })
+
+    return redirect('predict_diabetes_form')

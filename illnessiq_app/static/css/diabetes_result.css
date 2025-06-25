@@ -1,0 +1,195 @@
+body {
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f7f9fc;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar {
+    background-color: #fff;
+    padding: 10px 40px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky; 
+    top: 0; 
+    z-index: 1200; 
+    height: 60px; 
+    box-sizing: border-box; 
+}
+
+.logo img {
+    height: 40px;
+}
+
+.dropdown {
+    position: relative;
+}
+
+.dropdown-toggle {
+    font-size: 1.3rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    user-select: none;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    border-radius: 4px;
+    list-style: none;
+    margin: 5px 0 0 0;
+    padding: 0;
+    width: 140px;
+    z-index: 1100;
+}
+
+.dropdown-menu.show {
+    display: block;
+}
+
+.dropdown-menu li a {
+    display: block;
+    padding: 10px 15px;
+    color: #333;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.dropdown-menu li a:hover {
+    background-color: #2980b9;
+    color: white;
+    border-radius: 4px;
+}
+
+
+.save-button-container {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px 40px;
+    background: #fff; 
+    border-bottom: 1px solid #ddd;
+    position: sticky; 
+    top: 60px; 
+    z-index: 1000; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08); 
+}
+
+.save-button-container button {
+    background-color: #2980b9; 
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+    min-width: 80px; 
+    text-align: center;
+}
+
+.save-button-container button:hover {
+    background-color: #1c5980; 
+}
+
+
+.result-wrapper {
+    max-width: 900px; 
+    margin: 20px auto 40px auto; 
+    background: #fff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    line-height: 1.6; 
+}
+
+.result-summary {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.result-summary h2 {
+    font-size: 2.2rem;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.risk-level {
+    font-size: 1.8rem;
+    font-weight: 700;
+    padding: 10px 20px;
+    border-radius: 8px;
+    display: inline-block; 
+    margin-top: 15px;
+}
+
+.risk-level.high-risk {
+    background-color: #ffe0e0; 
+    color: #cc0000; 
+    border: 1px solid #cc0000;
+}
+
+.risk-level.low-risk {
+    background-color: #e8f5e9; 
+    color: #2a4d2a; 
+    border: 1px solid #4caf50;
+}
+
+.recommendations {
+    margin-top: 40px;
+}
+
+.recommendations h3 {
+    font-weight: 700;
+    color: #2980b9;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #2980b9;
+    padding-bottom: 8px;
+}
+
+
+.recommendation-content h1,
+.recommendation-content h2,
+.recommendation-content h3,
+.recommendation-content h4,
+.recommendation-content h5,
+.recommendation-content h6 {
+    color: #2c3e50; 
+    margin-top: 25px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee; 
+    padding-bottom: 5px;
+}
+.recommendation-content h3 {
+    font-size: 1.5rem; 
+}
+.recommendation-content h4 {
+    font-size: 1.2rem; 
+}
+
+
+.recommendation-content ul {
+    list-style-type: disc;
+    margin-left: 25px; 
+    padding-left: 0;
+    margin-bottom: 20px; 
+}
+
+.recommendation-content ul li {
+    margin-bottom: 8px; 
+    color: #555;
+}
+
+.recommendation-content p {
+    margin-bottom: 15px;
+    color: #444;
+}
