@@ -33,7 +33,12 @@
       {% csrf_token %}
 
       <div class="form-grid">
-
+        
+        <div class="form-group">
+          <label for="patient_name">Patient Full Name</label>
+          <input type="text" id="patient_name" name="Patient_Name" required>
+        </div>
+        
         <div class="form-group">
           <label for="age">Age</label>
           <input type="number" id="age" name="Age" required>

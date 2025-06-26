@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Diabetes Prediction Result | IllnessIQ</title>
+  <title>Heart Risk Prediction Result | IllnessIQ</title>
   <link rel="stylesheet" href="{% static 'css/result.css' %}" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet" />
 </head>
@@ -27,14 +27,13 @@
     </div>
   </nav>
 
-  
   <div class="save-button-container">
-    <a href="{% url 'download_diabetes_report' dr_id %}" class="save-button">Save</a>
-  </div>  
+    <a href="{% url 'download_heart_report' hr_id %}" class="save-button">Save</a>
+  </div>
 
   <main class="result-wrapper">
     <section class="result-summary">
-      <h2>Diabetes Risk Prediction Result</h2>
+      <h2>Heart Risk Prediction Result</h2>
       <p class="risk-level {% if result == 'High Risk' %}high-risk{% else %}low-risk{% endif %}">{{ result }}</p>
     </section>
 
@@ -51,7 +50,7 @@
   <script>
     const dropdownBtn = document.getElementById('dropdownBtn');
     const dropdownMenu = document.getElementById('dropdownMenu');
-    const savePredictionBtn = document.getElementById('savePredictionBtn'); // Get the new button
+    const savePredictionBtn = document.getElementById('savePredictionBtn');
 
     dropdownBtn.addEventListener('click', () => {
       dropdownMenu.classList.toggle('show');
@@ -62,7 +61,7 @@
         dropdownMenu.classList.remove('show');
       }
     });
-
   </script>
+
 </body>
 </html>

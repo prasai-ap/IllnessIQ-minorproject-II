@@ -1,15 +1,16 @@
 from django.shortcuts import render,redirect
 from django.db import connection ,IntegrityError
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 import random ,datetime
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
+from django.template.loader import get_template
 import os
 import joblib
 import pandas as pd
-import json
+from xhtml2pdf import pisa
 import markdown #
 import google.generativeai as genai
 
@@ -205,6 +206,7 @@ def report_issue(request):
 
 
 diabetes_model = os.path.join(settings.BASE_DIR, 'illnessiq_app', 'ml_models', 'diabetes_model.pkl')
+heart_model = os.path.join(settings.BASE_DIR, 'illnessiq_app', 'ml_models', 'heart_model.pkl')
 
 gender_map = {'Male': 1, 'Female': 0}
 hypertension_map = {'Yes': 1, 'No': 0}
@@ -240,7 +242,7 @@ def predict_diabetes(request):
             bmi = float(request.POST.get('BMI'))
             hba1c = float(request.POST.get('HbA1c_Level'))
             glucose = float(request.POST.get('Blood_Glucose_Level'))
-
+            patient_name = request.POST.get('Patient_Name')
             model_features = [
                 'gender', 'age', 'hypertension', 'heart_disease',
                 'smoking_history', 'bmi', 'HbA1c_level', 'blood_glucose_level'
@@ -265,10 +267,10 @@ def predict_diabetes(request):
             with connection.cursor() as cursor:
                 cursor.execute("""
                     INSERT INTO diabetes_medical_details 
-                    (u_id, age, gender, hypertension, heart_diseases, smoking_history, bmi, hba1c, blood_glucose)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING d_id
+                    (u_id, patient_name, age, gender, hypertension, heart_diseases, smoking_history, bmi, hba1c, blood_glucose)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING d_id
                 """, [
-                    user, age, gender, hypertension, heart_disease,
+                    user, patient_name, age, gender, hypertension, heart_disease,
                     smoking_status, bmi, hba1c, glucose
                 ])
                 d_id = cursor.fetchone()[0]
@@ -304,7 +306,8 @@ def predict_diabetes(request):
 
             return render(request, 'diabetes_risk_result.html', {
                 'result': result,
-                'recommendation_html': recommendation_html
+                'recommendation_html': recommendation_html,
+                'dr_id': dr_id
             })
 
         except ValueError as ve:
@@ -318,4 +321,194 @@ def predict_diabetes(request):
                 'recommendation_html': "<p>An unexpected issue occurred. Please try again later or contact support.</p>"
             })
 
-    return redirect('predict_diabetes_form')
+def predict_heart(request):
+    if not request.session.get('user_id'):
+        return redirect('login')
+
+    try:
+        model = joblib.load(heart_model)
+    except FileNotFoundError:
+        return render(request, 'heart_risk_result.html', {
+            'result': "Error: Heart model not found.",
+            'recommendation_html': "<p>Please contact support to resolve the system configuration issue.</p>"
+        })
+    except Exception as e:
+        return render(request, 'heart_risk_result.html', {
+            'result': f"Error loading model: {str(e)}",
+            'recommendation_html': "<p>An unexpected error occurred. Please contact support.</p>"
+        })
+
+    user_id = request.session.get('user_id')
+
+    if request.method == 'POST':
+        try:
+            patient_name = request.POST.get('Patient_Name')
+            age = int(request.POST.get('Age'))
+            gender = request.POST.get('Gender')
+            cholesterol = float(request.POST.get('Cholesterol'))
+            fasting_blood_sugar = request.POST.get('Fasting_Blood_Sugar')
+            heart_rate = int(request.POST.get('Heart_Rate'))
+
+            gender_encoded = 1 if gender.lower() == 'male' else 0
+            fbs_encoded = 1 if fasting_blood_sugar.lower() == 'yes' else 0
+
+            input_data = pd.DataFrame([{
+                'age': age,
+                'gender': gender_encoded,
+                'chol': cholesterol,
+                'fbs': fbs_encoded,
+                'thalach': heart_rate
+            }])
+
+            prediction = model.predict(input_data)[0]
+            result = "High Risk" if prediction == 1 else "Low Risk"
+
+            
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    INSERT INTO heart_medical_details 
+                    (u_id, patient_name, age, gender, cholesterol, high_blood_sugar, heart_rate)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING h_id
+                """, [user_id, patient_name, age, gender, cholesterol, fasting_blood_sugar, heart_rate])
+                h_id = cursor.fetchone()[0]
+
+                cursor.execute("""
+                    INSERT INTO heart_risk (risk_status, h_id)
+                    VALUES (%s, %s) RETURNING hr_id
+                """, [result, h_id])
+                hr_id = cursor.fetchone()[0]
+
+            prompt = f"""Based on the following user data, provide personalized health recommendations for heart diesase risk management.
+            The user is a {gender.lower()} aged {age} with a {result} of heart disease.
+            Key metrics: cholestrol = {cholesterol}, high fasting blood sugar = {fasting_blood_sugar}, heart rate = {heart_rate}.
+
+            Structure your response with clear headings for categories like "Summary of Risk", "Lifestyle Recommendations", "Dietary Advice", and "Medical Considerations".
+            Use bullet points for individual recommendations within each category.
+            Start directly with the recommendations, no introductory sentences before the first heading.
+            """
+
+
+            model_gemini = genai.GenerativeModel('gemini-2.5-flash')
+            response = model_gemini.generate_content(prompt)
+            recommendation_text = response.text.strip()
+            recommendation_html = markdown.markdown(recommendation_text)
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    INSERT INTO heart_recommendation (hr_id, recommendation)
+                    VALUES (%s, %s)
+                """, [hr_id, recommendation_text])
+
+            return render(request, 'heart_risk_result.html', {
+                'result': result,
+                'recommendation_html': recommendation_html,
+                'hr_id': hr_id
+            })
+
+        except ValueError as ve:
+            return render(request, 'heart_risk_result.html', {
+                'result': f"Input Error: {str(ve)}",
+                'recommendation_html': "<p>Please check the values and ensure all fields are filled correctly.</p>"
+            })
+        except Exception as e:
+            return render(request, 'heart_risk_result.html', {
+                'result': f"An unexpected error occurred: {str(e)}",
+                'recommendation_html': "<p>Please try again later or contact technical support.</p>"
+            })
+
+def download_diabetes_report(request, dr_id):
+    if not request.session.get('user_id'):
+        return redirect('login')
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT d.patient_name, d.age, d.gender, d.hypertension, d.heart_diseases,
+                   d.smoking_history, d.bmi, d.hba1c, d.blood_glucose,
+                   r.risk_status, rec.recommendation
+            FROM diabetes_medical_details d
+            JOIN diabetes_risk r ON d.d_id = r.d_id
+            JOIN diabetes_recommendation rec ON r.dr_id = rec.dr_id
+            WHERE r.dr_id = %s
+        """, [dr_id])
+        row = cursor.fetchone()
+
+    if not row:
+        return HttpResponse("No data found", status=404)
+
+    logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'logo.png')
+    static_url = f'file://{logo_path.rsplit("/", 1)[0]}/'
+
+    context = {
+        'patient_name': row[0],
+        'age': row[1],
+        'gender': row[2],
+        'hypertension': row[3],
+        'heart_disease': row[4],
+        'smoking': row[5],
+        'bmi': row[6],
+        'hba1c': row[7],
+        'glucose': row[8],
+        'risk_status': row[9],
+        'recommendation_html': markdown.markdown(row[10] or ""),
+        'date': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'STATIC_URL': static_url
+    }
+
+    template = get_template("diabetes_report_template.html")
+    html = template.render(context)
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="Diabetes_Report_{context["patient_name"]}.pdf"'
+
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+        return HttpResponse("PDF generation failed", status=500)
+
+    return response
+
+
+
+def download_heart_report(request, hr_id):
+    if not request.session.get('user_id'):
+        return redirect('login')
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT h.patient_name, h.age, h.gender, h.cholesterol, h.high_blood_sugar, h.heart_rate,
+                   r.risk_status, rec.recommendation
+            FROM heart_medical_details h
+            JOIN heart_risk r ON h.h_id = r.h_id
+            JOIN heart_recommendation rec ON r.hr_id = rec.hr_id
+            WHERE r.hr_id = %s
+        """, [hr_id])
+        row = cursor.fetchone()
+
+    if not row:
+        return HttpResponse("No data found", status=404)
+
+    logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'logo.png')
+    static_url = f'file://{logo_path.rsplit("/", 1)[0]}/'
+
+    context = {
+        'patient_name': row[0],
+        'age': row[1],
+        'gender': row[2],
+        'cholesterol': row[3],
+        'fasting_blood_sugar': row[4],
+        'heart_rate': row[5],
+        'risk_status': row[6],
+        'recommendation_html': markdown.markdown(row[7] or ""),
+        'date': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'STATIC_URL': static_url
+    }
+
+    template = get_template("heart_report_template.html")
+    html = template.render(context)
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="Heart_Report_{context["patient_name"]}.pdf"'
+
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+        return HttpResponse("PDF generation failed", status=500)
+
+    return response

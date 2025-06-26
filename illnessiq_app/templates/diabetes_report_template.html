@@ -1,0 +1,97 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: "Helvetica", sans-serif;
+            font-size: 12pt;
+            padding: 30px;
+            color: #222;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            height: 60px;
+            margin-bottom: 5px;
+        }
+
+        .title {
+            font-size: 20pt;
+            font-weight: bold;
+            color: #004080;
+            margin-top: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 8px;
+            border: 1px solid #ccc;
+        }
+
+        .section-title {
+            font-size: 14pt;
+            margin-top: 30px;
+            color: #004080;
+        }
+
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 10pt;
+            color: #888;
+        }
+
+        .branding {
+            text-align: center;
+            margin-top: 25px;
+            font-style: italic;
+            color: #004080;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <img src="{% static 'images/logo.png' %}" class="logo" alt="IllnessIQ Logo" />
+        <div class="title">Heart Disease Risk Report</div>
+        <div>{{ date }}</div>
+    </div>
+
+    <div class="section-title">Patient Summary</div>
+    <table>
+        <tr><th>Patient Name</th><td>{{ patient_name }}</td></tr>
+        <tr><th>Age</th><td>{{ age }}</td></tr>
+        <tr><th>Gender</th><td>{{ gender }}</td></tr>
+        <tr><th>Cholesterol</th><td>{{ cholesterol }} mg/dL</td></tr>
+        <tr><th>Fasting Blood Sugar</th><td>{{ fasting_blood_sugar }}</td></tr>
+        <tr><th>Heart Rate</th><td>{{ heart_rate }} bpm</td></tr>
+        <tr><th>Predicted Risk</th><td>{{ risk_status }}</td></tr>
+    </table>
+
+    <div class="section-title">AI-Generated Health Recommendations</div>
+    <div class="recommendation">
+        {{ recommendation_html|safe }}
+    </div>
+
+    <div class="branding">
+        Powered by IllnessIQ &bull; Smart Wellness, Smarter You
+    </div>
+
+    <div class="footer">
+        This report was generated automatically by IllnessIQ's AI-based heart risk prediction engine.
+        <br>Consult a licensed medical professional before making any health decisions.
+    </div>
+
+</body>
+</html>

@@ -33,10 +33,15 @@
       <div class="form-grid">
 
         <div class="form-group">
+          <label for="patient_name">Patient Full Name</label>
+          <input type="text" id="patient_name" name="Patient_Name" required>
+        </div>
+      
+        <div class="form-group">
           <label for="age">Age</label>
           <input type="number" id="age" name="Age" required>
         </div>
-
+      
         <div class="form-group">
           <label for="gender">Gender</label>
           <select id="gender" name="Gender" required>
@@ -45,7 +50,7 @@
             <option>Female</option>
           </select>
         </div>
-
+      
         <div class="form-group">
           <label for="hypertension">Do you have Hypertension?</label>
           <select id="hypertension" name="Hypertension" required>
@@ -54,7 +59,7 @@
             <option>No</option>
           </select>
         </div>
-
+      
         <div class="form-group">
           <label for="heart_disease">Do you have any Heart Disease?</label>
           <select id="heart_disease" name="Heart_Disease" required>
@@ -63,7 +68,7 @@
             <option>No</option>
           </select>
         </div>
-
+      
         <div class="form-group">
           <label for="smoking_status">Smoking Status</label>
           <select id="smoking_status" name="Smoking_Status" required>
@@ -73,24 +78,25 @@
             <option>Current</option>
           </select>
         </div>
-
+      
         <div class="form-group">
           <label for="bmi">Body Mass Index (BMI)</label>
           <input type="number" step="0.1" id="bmi" name="BMI" required>
         </div>
-
+      
         <div class="form-group">
           <label for="hba1c">HbA1c Level (%)</label>
           <input type="number" step="0.1" id="hba1c" name="HbA1c_Level" required>
         </div>
-
+      
         <div class="form-group">
           <label for="glucose">Blood Glucose Level (mg/dL)</label>
           <input type="number" step="1" id="glucose" name="Blood_Glucose_Level" required>
         </div>
-
+      
         <button type="submit">Predict</button>
       </div>
+      
     </form>
   </main>
 

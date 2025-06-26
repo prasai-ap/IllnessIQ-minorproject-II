@@ -16,4 +16,7 @@ urlpatterns = [
     path('feedback/',views.feedback,name='feedback'),
     path('report-issue/',views.report_issue,name='report_issue'),
     path('predict_diabetes/', views.predict_diabetes, name='predict_diabetes'),
+    path('predict_heart/', views.predict_heart, name='predict_heart'),
+    path('download_diabetes_report/<int:dr_id>/', views.download_diabetes_report, name='download_diabetes_report'),
+    path('download_heart_report/<int:hr_id>/', views.download_heart_report, name='download_heart_report'),
 ]
