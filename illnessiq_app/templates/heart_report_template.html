@@ -37,11 +37,34 @@
         th, td {
             padding: 8px;
             border: 1px solid #ccc;
+            vertical-align: top;
+        }
+
+        th {
+            width: 200px;
+            background-color: #f5f5f5;
+            text-align: left;
         }
 
         .section-title {
             font-size: 14pt;
             margin-top: 30px;
+            margin-bottom: 10px;
+            color: #004080;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .recommendation {
+            white-space: pre-wrap;
+            font-size: 11pt;
+            margin-top: 10px;
+            line-height: 1.6;
+        }
+
+        .branding {
+            text-align: center;
+            margin-top: 25px;
+            font-style: italic;
             color: #004080;
         }
 
@@ -51,21 +74,13 @@
             font-size: 10pt;
             color: #888;
         }
-
-        .branding {
-            text-align: center;
-            margin-top: 25px;
-            font-style: italic;
-            color: #004080;
-        }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <img src="{% static 'images/logo.png' %}" class="logo" alt="IllnessIQ Logo" />
+        <img src="{{ STATIC_URL }}logo.png" class="logo" alt="IllnessIQ Logo" />
         <div class="title">Heart Disease Risk Report</div>
-        <div>{{ date }}</div>
     </div>
 
     <div class="section-title">Patient Summary</div>
@@ -89,8 +104,8 @@
     </div>
 
     <div class="footer">
-        This report was generated automatically by IllnessIQ's AI-based heart risk prediction engine.
-        <br>Consult a licensed medical professional before making any health decisions.
+        This report was generated automatically by IllnessIQ's AI-based heart risk prediction engine.<br>
+        Consult a licensed medical professional before making any health decisions.
     </div>
 
 </body>

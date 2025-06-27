@@ -11,7 +11,7 @@ import os
 import joblib
 import pandas as pd
 from xhtml2pdf import pisa
-import markdown #
+import markdown 
 import google.generativeai as genai
 
 def index(request):
@@ -107,29 +107,58 @@ def signup(request):
     if request.method == 'POST':
         full_name = request.POST.get('full_name')
         email = request.POST.get('email')
+        
         with connection.cursor() as cursor:
+            # Check if email already exists
             cursor.execute("SELECT COUNT(*) FROM users WHERE u_email = %s", [email])
             if cursor.fetchone()[0] > 0:
                 messages.error(request, "Email already exists.")
                 return render(request, 'signup.html')
-    
-            cursor.execute("INSERT INTO users (u_name, u_email,u_role) VALUES (%s, %s, %s)", [full_name, email,'users'])
-        messages.success(request, "Account created successfully.")
-        subject = 'Welcome To IllnessIQ'
+
+            # Insert new user
+            cursor.execute("INSERT INTO users (u_name, u_email, u_role) VALUES (%s, %s, %s) RETURNING u_id", 
+                           [full_name, email, 'users'])
+            user_id = cursor.fetchone()[0]
+
+        # Save session values
+        request.session['otp_user_id'] = user_id
+        request.session['otp_user_email'] = email
+        request.session['otp_user_role'] = 'users'
+
+        # Generate OTP
+        otp = str(random.randint(100000, 999999))
+        created_at = datetime.datetime.now()
+        expires_at = created_at + datetime.timedelta(minutes=5)
+
+        # Save OTP to DB
+        with connection.cursor() as cursor:
+            cursor.execute("""INSERT INTO otp_verification (u_id, otp_code, created_at, expires_at, is_verified)
+                              VALUES (%s, %s, %s, %s, %s)""", [user_id, otp, created_at, expires_at, False])
+
+        # Send combined email
+        subject = 'Welcome to IllnessIQ – Your OTP & Introduction'
         message = f'''Dear {full_name},
-        Welcome to IllnessIQ – your personal companion for better health insights. We’re thrilled to have you on board. With IllnessIQ, you can:
-        
-        - Check your risk for common illnesses like diabetes, liver, heart, and thyroid problems.
-        - Get AI-based recommendations for health improvements.
-        - Track your medical history and wellness goals easily.
-        
-        Feel free to explore and take control of your health today!
-        
-        Best regards,  
-        The IllnessIQ Team'''
+
+Welcome to IllnessIQ – your personal companion for better health insights. We're thrilled to have you on board!
+
+Here’s your OTP to verify your email: {otp}
+(This OTP is valid for 5 minutes)
+
+Once verified, you can:
+- Check your risk for diseases like diabetes, heart, liver, and thyroid
+- Get AI-based health recommendations
+- Track your reports and progress
+
+Thank you for joining!
+
+– The IllnessIQ Team
+'''
         email_from = settings.EMAIL_HOST_USER
         send_mail(subject, message, email_from, [email])
-    return render(request,'signup.html')
+        return redirect('verify_otp')
+
+    return render(request, 'signup.html')
+
 
 def user_dashboard(request):
     if not request.session.get('user_id'):
@@ -222,12 +251,12 @@ def predict_diabetes(request):
     except FileNotFoundError:
         return render(request, 'diabetes_risk_result.html', {
             'result': "Error: Prediction model file not found.",
-            'recommendation_html': "<p>Please contact support regarding a system configuration error.</p>"
+            'recommendations': ["<p>Please contact support regarding a system configuration error.</p>"]
         })
     except Exception as e:
         return render(request, 'diabetes_risk_result.html', {
             'result': f"Error loading prediction model: {str(e)}",
-            'recommendation_html': "<p>Please contact support regarding a system configuration error.</p>"
+            'recommendations': ["<p>Please contact support regarding a system configuration error.</p>"]
         })
 
     user = request.session.get('user_id')
@@ -243,6 +272,7 @@ def predict_diabetes(request):
             hba1c = float(request.POST.get('HbA1c_Level'))
             glucose = float(request.POST.get('Blood_Glucose_Level'))
             patient_name = request.POST.get('Patient_Name')
+
             model_features = [
                 'gender', 'age', 'hypertension', 'heart_disease',
                 'smoking_history', 'bmi', 'HbA1c_level', 'blood_glucose_level'
@@ -260,10 +290,9 @@ def predict_diabetes(request):
             }
 
             input_data = pd.DataFrame([input_values], columns=model_features)
-
             prediction = model.predict(input_data)[0]
             result = "High Risk" if prediction == 1 else "Low Risk"
-            
+
             with connection.cursor() as cursor:
                 cursor.execute("""
                     INSERT INTO diabetes_medical_details 
@@ -280,7 +309,7 @@ def predict_diabetes(request):
                     VALUES (%s, %s) RETURNING dr_id
                 """, [result, d_id])
                 dr_id = cursor.fetchone()[0]
-                
+
             prompt = f"""Based on the following user data, provide personalized health recommendations for diabetes risk management.
             The user is a {gender.lower()} aged {age} with a {result} of diabetes.
             Key metrics: BMI = {bmi}, HbA1c = {hba1c}, Blood Glucose = {glucose}.
@@ -294,9 +323,12 @@ def predict_diabetes(request):
             model_gemini = genai.GenerativeModel('gemini-2.5-flash')
             response = model_gemini.generate_content(prompt)
             recommendation_text = response.text.strip()
-            
-            recommendation_html = markdown.markdown(recommendation_text)
 
+            # Split into cards (sections) and convert to markdown HTML
+            sections = [s.strip() for s in recommendation_text.split("\n\n") if s.strip()]
+            recommendations = [markdown.markdown(section) for section in sections]
+
+            # Save full text in database
             with connection.cursor() as cursor:
                 cursor.execute("""
                     INSERT INTO diabetes_recommendation (dr_id, recommendation)
@@ -306,20 +338,21 @@ def predict_diabetes(request):
 
             return render(request, 'diabetes_risk_result.html', {
                 'result': result,
-                'recommendation_html': recommendation_html,
+                'recommendations': recommendations,
                 'dr_id': dr_id
             })
 
         except ValueError as ve:
             return render(request, 'diabetes_risk_result.html', {
                 'result': f"Error: Invalid input data. Please ensure all fields are correctly filled. Details: {str(ve)}",
-                'recommendation_html': "<p>Please check your input values and try again.</p>"
+                'recommendations': ["<p>Please check your input values and try again.</p>"]
             })
         except Exception as e:
             return render(request, 'diabetes_risk_result.html', {
                 'result': f"An unexpected error occurred during prediction: {str(e)}",
-                'recommendation_html': "<p>An unexpected issue occurred. Please try again later or contact support.</p>"
+                'recommendations': ["<p>An unexpected issue occurred. Please try again later or contact support.</p>"]
             })
+
 
 def predict_heart(request):
     if not request.session.get('user_id'):
@@ -330,12 +363,12 @@ def predict_heart(request):
     except FileNotFoundError:
         return render(request, 'heart_risk_result.html', {
             'result': "Error: Heart model not found.",
-            'recommendation_html': "<p>Please contact support to resolve the system configuration issue.</p>"
+            'recommendations': ["<p>Please contact support to resolve the system configuration issue.</p>"]
         })
     except Exception as e:
         return render(request, 'heart_risk_result.html', {
             'result': f"Error loading model: {str(e)}",
-            'recommendation_html': "<p>An unexpected error occurred. Please contact support.</p>"
+            'recommendations': ["<p>An unexpected error occurred. Please contact support.</p>"]
         })
 
     user_id = request.session.get('user_id')
@@ -363,7 +396,6 @@ def predict_heart(request):
             prediction = model.predict(input_data)[0]
             result = "High Risk" if prediction == 1 else "Low Risk"
 
-            
             with connection.cursor() as cursor:
                 cursor.execute("""
                     INSERT INTO heart_medical_details 
@@ -378,20 +410,22 @@ def predict_heart(request):
                 """, [result, h_id])
                 hr_id = cursor.fetchone()[0]
 
-            prompt = f"""Based on the following user data, provide personalized health recommendations for heart diesase risk management.
+            prompt = f"""Based on the following user data, provide personalized health recommendations for heart disease risk management.
             The user is a {gender.lower()} aged {age} with a {result} of heart disease.
-            Key metrics: cholestrol = {cholesterol}, high fasting blood sugar = {fasting_blood_sugar}, heart rate = {heart_rate}.
+            Key metrics: cholesterol = {cholesterol}, high fasting blood sugar = {fasting_blood_sugar}, heart rate = {heart_rate}.
 
             Structure your response with clear headings for categories like "Summary of Risk", "Lifestyle Recommendations", "Dietary Advice", and "Medical Considerations".
             Use bullet points for individual recommendations within each category.
             Start directly with the recommendations, no introductory sentences before the first heading.
             """
 
-
             model_gemini = genai.GenerativeModel('gemini-2.5-flash')
             response = model_gemini.generate_content(prompt)
             recommendation_text = response.text.strip()
-            recommendation_html = markdown.markdown(recommendation_text)
+
+            sections = [s.strip() for s in recommendation_text.split("\n\n") if s.strip()]
+            recommendations = [markdown.markdown(section) for section in sections]
+
             with connection.cursor() as cursor:
                 cursor.execute("""
                     INSERT INTO heart_recommendation (hr_id, recommendation)
@@ -400,20 +434,21 @@ def predict_heart(request):
 
             return render(request, 'heart_risk_result.html', {
                 'result': result,
-                'recommendation_html': recommendation_html,
+                'recommendations': recommendations,
                 'hr_id': hr_id
             })
 
         except ValueError as ve:
             return render(request, 'heart_risk_result.html', {
                 'result': f"Input Error: {str(ve)}",
-                'recommendation_html': "<p>Please check the values and ensure all fields are filled correctly.</p>"
+                'recommendations': ["<p>Please check the values and ensure all fields are filled correctly.</p>"]
             })
         except Exception as e:
             return render(request, 'heart_risk_result.html', {
                 'result': f"An unexpected error occurred: {str(e)}",
-                'recommendation_html': "<p>Please try again later or contact technical support.</p>"
+                'recommendations': ["<p>Please try again later or contact technical support.</p>"]
             })
+
 
 def download_diabetes_report(request, dr_id):
     if not request.session.get('user_id'):

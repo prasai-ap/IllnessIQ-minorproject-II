@@ -10,6 +10,7 @@
 </head>
 <body>
 
+
   <nav class="navbar">
     <div class="logo">
       <a href="{% url 'user_dashboard' %}">
@@ -31,26 +32,37 @@
     <a href="{% url 'download_heart_report' hr_id %}" class="save-button">Save</a>
   </div>
 
-  <main class="result-wrapper">
-    <section class="result-summary">
-      <h2>Heart Risk Prediction Result</h2>
-      <p class="risk-level {% if result == 'High Risk' %}high-risk{% else %}low-risk{% endif %}">{{ result }}</p>
-    </section>
+  <main class="result-container">
 
-    {% if recommendation_html %}
-      <section class="recommendations">
-        <h3>Personalized Health Recommendations</h3>
-        <div class="recommendation-content">{{ recommendation_html|safe }}</div>
-      </section>
+    <div class="result-card summary-card">
+      <h2>Heart Risk Prediction Result</h2>
+      <p class="risk-level {% if result == 'High Risk' %}high-risk{% else %}low-risk{% endif %}">
+        {{ result }}
+      </p>
+    </div>
+
+    {% if recommendations %}
+    <div class="result-card recommendation-section">
+      <h3>Personalized Health Recommendations</h3>
+      <div class="recommendation-cards">
+        {% for rec in recommendations %}
+          <div class="recommendation-card">
+            {{ rec|safe }}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
     {% else %}
+    <div class="result-card no-recommendations">
       <p>No specific recommendations available at this time.</p>
+    </div>
     {% endif %}
+
   </main>
 
   <script>
     const dropdownBtn = document.getElementById('dropdownBtn');
     const dropdownMenu = document.getElementById('dropdownMenu');
-    const savePredictionBtn = document.getElementById('savePredictionBtn');
 
     dropdownBtn.addEventListener('click', () => {
       dropdownMenu.classList.toggle('show');

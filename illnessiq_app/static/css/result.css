@@ -1,186 +1,207 @@
 /* Base Reset & Typography */
 body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Inter', sans-serif;
-    background: linear-gradient(to right, #e0eafc, #cfdef3);
-    color: #333;
-    min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(to right, #e0eafc, #cfdef3);
+  color: #333;
+  min-height: 100vh;
+}
+
+/* Navbar Styling */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffffee;
+  padding: 10px 30px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar .logo img {
+  height: 45px;
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-toggle {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  min-width: 150px;
+}
+
+.dropdown-menu li {
+  list-style: none;
+}
+
+.dropdown-menu a {
+  display: block;
+  padding: 10px 15px;
+  color: #333;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.dropdown-menu a:hover {
+  background-color: #f0f0f0;
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+
+/* Save Button */
+.save-button-container {
+  display: flex;
+  justify-content: flex-end;
+  margin: 20px 40px 0;
+}
+
+.save-button {
+  padding: 10px 24px;
+  background-color: #0077cc;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-decoration: none;
+}
+
+.save-button:hover {
+  background-color: #005fa3;
+}
+
+
+.result-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.result-card {
+  background-color: #ffffffee;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.summary-card {
+  text-align: center;
+}
+
+.summary-card h2 {
+  font-size: 28px;
+  margin-bottom: 15px;
+}
+
+.risk-level {
+  font-size: 22px;
+  font-weight: 600;
+  display: inline-block;
+  padding: 10px 20px;
+  border-radius: 8px;
+}
+
+.risk-level.high-risk {
+  background-color: #ffe6e6;
+  color: #b30000;
+}
+
+.risk-level.low-risk {
+  background-color: #e6ffe6;
+  color: #006600;
+}
+
+
+.recommendation-section h3 {
+  font-size: 22px;
+  margin-bottom: 15px;
+}
+
+.recommendation-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.recommendation-card {
+  background-color: #f4f8ff;
+  border: 1px solid #d0d8f0;
+  border-radius: 12px;
+  padding: 20px 24px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+  line-height: 1.6;
+  font-size: 15px;
+  color: #333;
+  transition: transform 0.2s ease-in-out;
+}
+
+.recommendation-card:hover {
+  transform: scale(1.02);
+}
+
+.recommendation-card h2,
+.recommendation-card h3 {
+  color: #004080;
+  margin-bottom: 12px;
+}
+
+.recommendation-card ul {
+  padding-left: 20px;
+  margin-top: 10px;
+}
+
+.recommendation-card li {
+  margin-bottom: 10px;
+}
+
+
+.result-wrapper {
+  display: none; 
+}
+
+
+p {
+  text-align: center;
+  margin-top: 30px;
+  font-style: italic;
+  color: #555;
+}
+
+
+@media (max-width: 768px) {
+  .result-container {
+    padding: 20px;
+    margin: 20px;
   }
-  
-  /* Navbar Styling */
-  .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #ffffffee;
-    padding: 10px 30px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .navbar .logo img {
-    height: 45px;
-  }
-  
-  .dropdown {
-    position: relative;
-  }
-  
-  .dropdown-toggle {
-    background: none;
-    border: none;
-    font-size: 22px;
-    cursor: pointer;
-  }
-  
-  .dropdown-menu {
-    display: none;
-    position: absolute;
-    right: 0;
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    z-index: 100;
-    min-width: 150px;
-  }
-  
-  .dropdown-menu li {
-    list-style: none;
-  }
-  
-  .dropdown-menu a {
-    display: block;
-    padding: 10px 15px;
-    color: #333;
-    text-decoration: none;
-    transition: background 0.2s ease;
-  }
-  
-  .dropdown-menu a:hover {
-    background-color: #f0f0f0;
-  }
-  
-  .dropdown-menu.show {
-    display: block;
-  }
-  
-  /* Save Button */
+
   .save-button-container {
-    display: flex;
-    justify-content: flex-end;
-    margin: 20px 40px 0;
+    justify-content: center;
+    margin: 20px 0;
   }
-  
+
   .save-button {
-    padding: 10px 24px;
-    background-color: #0077cc;
-    color: white;
-    font-weight: 600;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+    width: 80%;
   }
-  
-  .save-button:hover {
-    background-color: #005fa3;
-  }
-  
-  /* Result Wrapper */
-  .result-wrapper {
-    max-width: 850px;
-    margin: 40px auto;
-    background-color: #ffffffee;
-    padding: 40px;
-    border-radius: 16px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Prediction Summary */
-  .result-summary {
-    text-align: center;
-    margin-bottom: 30px;
-  }
-  
-  .result-summary h2 {
-    font-size: 28px;
-    margin-bottom: 10px;
-  }
-  
-  .risk-level {
-    font-size: 24px;
-    padding: 8px 16px;
-    border-radius: 8px;
-    display: inline-block;
-  }
-  
-  .risk-level.high-risk {
-    color: #b30000;
-    background-color: #ffe6e6;
-  }
-  
-  .risk-level.low-risk {
-    color: #006600;
-    background-color: #e6ffe6;
-  }
-  
-  /* Recommendations Section */
-  .recommendations {
-    margin-top: 30px;
-  }
-  
-  .recommendations h3 {
-    font-size: 22px;
-    margin-bottom: 15px;
-  }
-  
-  .recommendation-content {
-    background-color: #f9f9f9;
-    padding: 25px;
-    border-left: 5px solid #0077cc;
-    border-radius: 10px;
-    line-height: 1.6;
-  }
-  
-  .recommendation-content h2,
-  .recommendation-content h3 {
-    color: #333;
-    margin-top: 20px;
-    font-size: 20px;
-  }
-  
-  .recommendation-content ul {
-    margin-left: 20px;
-    margin-top: 10px;
-  }
-  
-  .recommendation-content li {
-    margin-bottom: 10px;
-  }
-  
-  /* Fallback Message */
-  p {
-    text-align: center;
-    margin-top: 30px;
-    font-style: italic;
-    color: #555;
-  }
-  
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .result-wrapper {
-      padding: 20px;
-      margin: 20px;
-    }
-  
-    .save-button-container {
-      justify-content: center;
-      margin: 20px 0;
-    }
-  
-    .save-button {
-      width: 80%;
-    }
-  }
-  
+}

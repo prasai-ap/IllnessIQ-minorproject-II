@@ -37,12 +37,21 @@
         th, td {
             padding: 8px;
             border: 1px solid #ccc;
+            vertical-align: top;
         }
 
         .section-title {
             font-size: 14pt;
             margin-top: 30px;
+            margin-bottom: 10px;
             color: #004080;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .recommendation {
+            white-space: pre-wrap;
+            font-size: 11pt;
+            margin-top: 10px;
         }
 
         .footer {
@@ -63,9 +72,8 @@
 <body>
 
     <div class="header">
-        <img src="{% static 'images/logo.png' %}" class="logo" alt="IllnessIQ Logo" />
-        <div class="title">Heart Disease Risk Report</div>
-        <div>{{ date }}</div>
+        <img src="{{ STATIC_URL }}logo.png" class="logo" alt="IllnessIQ Logo" />
+        <div class="title">Diabetes Risk Report</div>
     </div>
 
     <div class="section-title">Patient Summary</div>
@@ -73,9 +81,12 @@
         <tr><th>Patient Name</th><td>{{ patient_name }}</td></tr>
         <tr><th>Age</th><td>{{ age }}</td></tr>
         <tr><th>Gender</th><td>{{ gender }}</td></tr>
-        <tr><th>Cholesterol</th><td>{{ cholesterol }} mg/dL</td></tr>
-        <tr><th>Fasting Blood Sugar</th><td>{{ fasting_blood_sugar }}</td></tr>
-        <tr><th>Heart Rate</th><td>{{ heart_rate }} bpm</td></tr>
+        <tr><th>Hypertension</th><td>{{ hypertension }}</td></tr>
+        <tr><th>Heart Disease</th><td>{{ heart_disease }}</td></tr>
+        <tr><th>Smoking History</th><td>{{ smoking }}</td></tr>
+        <tr><th>BMI</th><td>{{ bmi }}</td></tr>
+        <tr><th>HbA1c Level (%)</th><td>{{ hba1c }}</td></tr>
+        <tr><th>Blood Glucose Level (mg/dL)</th><td>{{ glucose }}</td></tr>
         <tr><th>Predicted Risk</th><td>{{ risk_status }}</td></tr>
     </table>
 
@@ -86,10 +97,11 @@
 
     <div class="branding">
         Powered by IllnessIQ &bull; Smart Wellness, Smarter You
+    
     </div>
 
     <div class="footer">
-        This report was generated automatically by IllnessIQ's AI-based heart risk prediction engine.
+        This report was generated automatically by IllnessIQ's AI-based diabetes risk prediction engine.
         <br>Consult a licensed medical professional before making any health decisions.
     </div>
 
