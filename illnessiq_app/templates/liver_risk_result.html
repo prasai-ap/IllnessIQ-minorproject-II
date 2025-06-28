@@ -4,13 +4,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Diabetes Prediction Result | IllnessIQ</title>
-  <link rel="stylesheet" href="{% static 'css/result.css' %}" />
+  <title>Liver Prediction Result | IllnessIQ</title>
+  <link rel="stylesheet" href="{% static 'css/result.css' %}?v=2" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
 
-  
   <nav class="navbar">
     <div class="logo">
       <a href="{% url 'user_dashboard' %}">
@@ -30,21 +29,18 @@
 
 
   <div class="save-button-container">
-    <a href="{% url 'download_diabetes_report' dr_id %}" class="save-button">Save</a>
+    <a href="{% url 'download_liver_report' lr_id %}" class="save-button">Save</a>
   </div>
-
 
   <main class="result-container">
 
-    
     <div class="result-card summary-card">
-      <h2>Diabetes Risk Prediction Result</h2>
+      <h2>Liver Risk Prediction Result</h2>
       <p class="risk-level {% if result == 'High Risk' %}high-risk{% else %}low-risk{% endif %}">
         {{ result }}
       </p>
     </div>
 
-  
     {% if recommendations %}
     <div class="result-card recommendation-section">
       <h3>Personalized Health Recommendations</h3>
@@ -64,7 +60,6 @@
 
   </main>
 
-  
   <script>
     const dropdownBtn = document.getElementById('dropdownBtn');
     const dropdownMenu = document.getElementById('dropdownMenu');

@@ -28,7 +28,7 @@
   </nav>
 
   <main class="thyroid-form-wrapper">
-    <form action="/predict_thyroid/" method="POST" class="thyroid-form">
+    <form action="/predict_thyroid/" method="POST" class="thyroid-form" id="thyroidForm">
       <h2>Thyroid Prediction Insights</h2>
       {% csrf_token %}
 
@@ -47,6 +47,7 @@
         <div class="form-group">
           <label for="gender">Gender</label>
           <select id="gender" name="Gender">
+            <option value="">-- Select Gender --</option>
             <option>Male</option>
             <option>Female</option>
           </select>
@@ -54,23 +55,28 @@
 
         <div class="form-group">
           <label for="tsh">TSH (mIU/L)</label>
-          <input type="number" step="0.01" id="tsh" name="TSH" required>
+          <input type="number" step="any" id="tsh" name="TSH" required>
         </div>
 
         <div class="form-group">
           <label for="ft4">FT4 (ng/dL)</label>
-          <input type="number" step="0.01" id="ft4" name="FT4" required>
+          <input type="number" step="any" id="ft4" name="FT4" required>
         </div>
 
         <div class="form-group">
           <label for="ft3">FT3 (pg/mL)</label>
-          <input type="number" step="0.01" id="ft3" name="FT3" required>
+          <input type="number" step="any" id="ft3" name="FT3" required>
         </div>
 
         <button type="submit">Predict</button>
       </div>
     </form>
   </main>
+
+  <div id="loadingOverlay">
+    <div class="spinner"></div>
+    <p>Analyzing your inputs... Please wait</p>
+  </div>
 
   <script>
     const dropdownBtn = document.getElementById('dropdownBtn');
@@ -84,6 +90,10 @@
       if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
         dropdownMenu.classList.remove('show');
       }
+    });
+
+    diabetesForm.addEventListener('submit', function () {
+      loadingOverlay.style.display = 'flex';
     });
   </script>
 

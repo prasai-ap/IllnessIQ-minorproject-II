@@ -236,6 +236,7 @@ def report_issue(request):
 
 diabetes_model = os.path.join(settings.BASE_DIR, 'illnessiq_app', 'ml_models', 'diabetes_model.pkl')
 heart_model = os.path.join(settings.BASE_DIR, 'illnessiq_app', 'ml_models', 'heart_model.pkl')
+liver_model = os.path.join(settings.BASE_DIR, 'illnessiq_app', 'ml_models', 'liver_model.pkl')
 
 gender_map = {'Male': 1, 'Female': 0}
 hypertension_map = {'Yes': 1, 'No': 0}
@@ -324,11 +325,11 @@ def predict_diabetes(request):
             response = model_gemini.generate_content(prompt)
             recommendation_text = response.text.strip()
 
-            # Split into cards (sections) and convert to markdown HTML
+            
             sections = [s.strip() for s in recommendation_text.split("\n\n") if s.strip()]
             recommendations = [markdown.markdown(section) for section in sections]
 
-            # Save full text in database
+            
             with connection.cursor() as cursor:
                 cursor.execute("""
                     INSERT INTO diabetes_recommendation (dr_id, recommendation)
@@ -449,6 +450,121 @@ def predict_heart(request):
                 'recommendations': ["<p>Please try again later or contact technical support.</p>"]
             })
 
+def predict_liver(request):
+    if not request.session.get('user_id'):
+        return redirect('login')
+
+    try:
+        model = joblib.load(liver_model)
+    except FileNotFoundError:
+        return render(request, 'liver_risk_result.html', {
+            'result': "Error: Liver model not found.",
+            'recommendations': ["<p>Please contact support to resolve the system configuration issue.</p>"]
+        })
+    except Exception as e:
+        return render(request, 'liver_risk_result.html', {
+            'result': f"Error loading model: {str(e)}",
+            'recommendations': ["<p>An unexpected error occurred. Please contact support.</p>"]
+        })
+
+    user_id = request.session.get('user_id')
+
+    if request.method == 'POST':
+        try:
+            patient_name = request.POST.get('Patient_Name')
+            age = int(request.POST.get('Age'))
+            gender = request.POST.get('Gender')
+            tb = float(request.POST.get('Total_Bilirubin'))
+            db = float(request.POST.get('Direct_Bilirubin'))
+            sgot = float(request.POST.get('SGOT'))
+            sgpt = float(request.POST.get('SGPT'))
+            alkp = float(request.POST.get('Alkaline_Phosphatase'))
+            protein = float(request.POST.get('Total_Protein'))
+            albumin = float(request.POST.get('Albumin'))
+            ag_ratio = float(request.POST.get('A_G_Ratio'))
+
+    
+            gender_encoded = 1 if gender.lower() == 'male' else 0
+
+            model_features = [ 'Age ','Gender','Total_Bilirubin','Direct_Bilirubin',
+                'Alkaline_Phosphatase', 'Sgpt', 'Sgot ', 'Total_Proteins', ' Albumin', 'A_G_Ratio'
+                
+            ]
+
+            input_values = {
+                'Age': age,
+                'Gender': gender_encoded,
+                'Total_Bilirubin': tb,
+                'Direct_Bilirubin': db,
+                'Alkaline_Phosphatase': alkp,
+                'Sgpt': sgpt,
+                'Sgot': sgot,
+                'Total_Proteins': protein,
+                'Albumin': albumin,
+                'A_G_Ratio': ag_ratio 
+            }
+
+            input_data = pd.DataFrame([input_values], columns=model_features)
+            
+            prediction = model.predict(input_data)[0]
+            result = "High Risk" if prediction == 1 else "Low Risk"
+
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    INSERT INTO liver_medical_details 
+                    (u_id, patient_name, age, gender, bilirubin_total, bilirubin_direct, sgot, sgpt, alkaline_phosphatase, protein, albumin, ag_ratio)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    RETURNING l_id
+                """, [
+                    user_id, patient_name, age, gender, tb, db, sgot, sgpt, alkp, protein, albumin, ag_ratio
+                ])
+                l_id = cursor.fetchone()[0]
+
+                cursor.execute("""
+                    INSERT INTO liver_risk (risk_status, l_id)
+                    VALUES (%s, %s) RETURNING lr_id
+                """, [result, l_id])
+                lr_id = cursor.fetchone()[0]
+
+            prompt = f"""Based on the following user data, provide personalized health recommendations for liver health management.
+            The user is a {gender.lower()} aged {age} with a {result} of liver disease.
+            Key metrics: Total Bilirubin = {tb}, Direct Bilirubin = {db}, SGOT = {sgot}, SGPT = {sgpt}, ALP = {alkp}, Protein = {protein}, Albumin = {albumin}, A/G Ratio = {ag_ratio}.
+
+            Structure your response with clear headings for categories like "Summary of Risk", "Lifestyle Recommendations", "Dietary Advice", and "Medical Considerations".
+            Use bullet points for individual recommendations within each category.
+            Start directly with the recommendations, no introductory sentences before the first heading.
+            """
+
+            model_gemini = genai.GenerativeModel('gemini-2.5-flash')
+            response = model_gemini.generate_content(prompt)
+            recommendation_text = response.text.strip()
+
+            sections = [s.strip() for s in recommendation_text.split("\n\n") if s.strip()]
+            recommendations = [markdown.markdown(section) for section in sections]
+
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    INSERT INTO liver_recommendation (lr_id, recommendation)
+                    VALUES (%s, %s)
+                """, [lr_id, recommendation_text])
+
+            return render(request, 'liver_risk_result.html', {
+                'result': result,
+                'recommendations': recommendations,
+                'lr_id': lr_id
+            })
+
+        except ValueError as ve:
+            return render(request, 'liver_risk_result.html', {
+                'result': f"Input Error: {str(ve)}",
+                'recommendations': ["<p>Please check the values and ensure all fields are filled correctly.</p>"]
+            })
+        except Exception as e:
+            return render(request, 'liver_risk_result.html', {
+                'result': f"An unexpected error occurred: {str(e)}",
+                'recommendations': ["<p>Please try again later or contact technical support.</p>"]
+            })
+
 
 def download_diabetes_report(request, dr_id):
     if not request.session.get('user_id'):
@@ -501,7 +617,6 @@ def download_diabetes_report(request, dr_id):
     return response
 
 
-
 def download_heart_report(request, hr_id):
     if not request.session.get('user_id'):
         return redirect('login')
@@ -541,6 +656,58 @@ def download_heart_report(request, hr_id):
 
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="Heart_Report_{context["patient_name"]}.pdf"'
+
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+        return HttpResponse("PDF generation failed", status=500)
+
+    return response
+
+def download_liver_report(request, lr_id):
+    if not request.session.get('user_id'):
+        return redirect('login')
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT l.patient_name, l.age, l.gender, l.bilirubin_total, l.bilirubin_direct,
+                   l.sgot, l.sgpt, l.alkaline_phosphatase, l.protein, l.albumin, l.ag_ratio,
+                   r.risk_status, rec.recommendation
+            FROM liver_medical_details l
+            JOIN liver_risk r ON l.l_id = r.l_id
+            JOIN liver_recommendation rec ON r.lr_id = rec.lr_id
+            WHERE r.lr_id = %s
+        """, [lr_id])
+        row = cursor.fetchone()
+
+    if not row:
+        return HttpResponse("No data found", status=404)
+
+    logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'logo.png')
+    static_url = f'file://{logo_path.rsplit("/", 1)[0]}/'
+
+    context = {
+        'patient_name': row[0],
+        'age': row[1],
+        'gender': row[2],
+        'total_bilirubin': row[3],
+        'direct_bilirubin': row[4],
+        'sgot': row[5],
+        'sgpt': row[6],
+        'alkaline_phosphatase': row[7],
+        'total_protein': row[8],
+        'albumin': row[9],
+        'a_g_ratio': row[10],
+        'risk_status': row[11],
+        'recommendation_html': markdown.markdown(row[12] or ""),
+        'date': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'STATIC_URL': static_url
+    }
+
+    template = get_template("liver_report_template.html")
+    html = template.render(context)
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="Liver_Report_{context["patient_name"]}.pdf"'
 
     pisa_status = pisa.CreatePDF(html, dest=response)
     if pisa_status.err:

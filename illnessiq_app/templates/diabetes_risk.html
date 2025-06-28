@@ -2,11 +2,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Diabetes Prediction | IllnessIQ</title>
   <link rel="stylesheet" href="{% static 'css/diabetesrisk.css' %}" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    #loadingOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.85);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-family: 'Inter', sans-serif;
+      color: #004080;
+    }
+
+    .spinner {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #0077cc;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 15px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
 
@@ -26,22 +58,19 @@
   </nav>
 
   <main class="diabetes-form-wrapper">
-    <form action="{% url 'predict_diabetes'%}" method="POST" class="diabetes-form">
+    <form action="{% url 'predict_diabetes'%}" method="POST" class="diabetes-form" id="diabetesForm">
       <h2>Diabetes Prediction Insights</h2>
       {% csrf_token %}
 
       <div class="form-grid">
-
         <div class="form-group">
           <label for="patient_name">Patient Full Name</label>
           <input type="text" id="patient_name" name="Patient_Name" required>
         </div>
-      
         <div class="form-group">
           <label for="age">Age</label>
           <input type="number" id="age" name="Age" required>
         </div>
-      
         <div class="form-group">
           <label for="gender">Gender</label>
           <select id="gender" name="Gender" required>
@@ -50,7 +79,6 @@
             <option>Female</option>
           </select>
         </div>
-      
         <div class="form-group">
           <label for="hypertension">Do you have Hypertension?</label>
           <select id="hypertension" name="Hypertension" required>
@@ -59,7 +87,6 @@
             <option>No</option>
           </select>
         </div>
-      
         <div class="form-group">
           <label for="heart_disease">Do you have any Heart Disease?</label>
           <select id="heart_disease" name="Heart_Disease" required>
@@ -68,7 +95,6 @@
             <option>No</option>
           </select>
         </div>
-      
         <div class="form-group">
           <label for="smoking_status">Smoking Status</label>
           <select id="smoking_status" name="Smoking_Status" required>
@@ -78,31 +104,36 @@
             <option>Current</option>
           </select>
         </div>
-      
         <div class="form-group">
           <label for="bmi">Body Mass Index (BMI)</label>
-          <input type="number" step="0.1" id="bmi" name="BMI" required>
+          <input type="number" step="any" id="bmi" name="BMI" required>
         </div>
-      
         <div class="form-group">
           <label for="hba1c">HbA1c Level (%)</label>
-          <input type="number" step="0.1" id="hba1c" name="HbA1c_Level" required>
+          <input type="number" step="any" id="hba1c" name="HbA1c_Level" required>
         </div>
-      
         <div class="form-group">
           <label for="glucose">Blood Glucose Level (mg/dL)</label>
-          <input type="number" step="1" id="glucose" name="Blood_Glucose_Level" required>
+          <input type="number" step="any" id="glucose" name="Blood_Glucose_Level" required>
         </div>
-      
+
         <button type="submit">Predict</button>
       </div>
-      
     </form>
   </main>
+
+  
+  <div id="loadingOverlay">
+    <div class="spinner"></div>
+    <p>Please wait, analyzing your health data...</p>
+  </div>
+
 
   <script>
     const dropdownBtn = document.getElementById('dropdownBtn');
     const dropdownMenu = document.getElementById('dropdownMenu');
+    const diabetesForm = document.getElementById('diabetesForm');
+    const loadingOverlay = document.getElementById('loadingOverlay');
 
     dropdownBtn.addEventListener('click', () => {
       dropdownMenu.classList.toggle('show');
@@ -112,6 +143,10 @@
       if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
         dropdownMenu.classList.remove('show');
       }
+    });
+
+    diabetesForm.addEventListener('submit', function () {
+      loadingOverlay.style.display = 'flex';
     });
   </script>
 

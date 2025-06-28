@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Heart Risk Prediction | IllnessIQ</title>
   <link rel="stylesheet" href="{% static 'css/heartrisk.css' %}" />
@@ -28,22 +28,18 @@
   </nav>
 
   <main class="heart-form-wrapper">
-    <form action="/predict_heart/" method="POST" class="heart-form">
+    <form action="{% url 'predict_heart' %}" method="POST" class="heart-form" id="heartForm">
       <h2>Heart Risk Prediction Insights</h2>
       {% csrf_token %}
-
       <div class="form-grid">
-        
         <div class="form-group">
           <label for="patient_name">Patient Full Name</label>
           <input type="text" id="patient_name" name="Patient_Name" required>
         </div>
-        
         <div class="form-group">
           <label for="age">Age</label>
           <input type="number" id="age" name="Age" required>
         </div>
-
         <div class="form-group">
           <label for="gender">Gender</label>
           <select id="gender" name="Gender" required>
@@ -52,12 +48,10 @@
             <option>Female</option>
           </select>
         </div>
-
         <div class="form-group">
           <label for="cholesterol">Cholesterol Level (mg/dL)</label>
-          <input type="number" id="cholesterol" name="Cholesterol" required>
+          <input type="number" step="any" id="cholesterol" name="Cholesterol" required>
         </div>
-
         <div class="form-group">
           <label for="fasting_blood_sugar">High Fasting Blood Sugar (&gt; 120 mg/dL)?</label>
           <select id="fasting_blood_sugar" name="Fasting_Blood_Sugar" required>
@@ -66,29 +60,34 @@
             <option>No</option>
           </select>
         </div>
-
         <div class="form-group">
           <label for="heart_rate">Heart Rate (bpm)</label>
           <input type="number" id="heart_rate" name="Heart_Rate" required>
         </div>
-
         <button type="submit">Predict</button>
       </div>
     </form>
   </main>
 
+  <div id="loadingOverlay">
+    <div class="spinner"></div>
+    <p>Please wait, analyzing your health data...</p>
+  </div>
+
   <script>
     const dropdownBtn = document.getElementById('dropdownBtn');
     const dropdownMenu = document.getElementById('dropdownMenu');
-
     dropdownBtn.addEventListener('click', () => {
       dropdownMenu.classList.toggle('show');
     });
-
     window.addEventListener('click', (e) => {
       if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
         dropdownMenu.classList.remove('show');
       }
+    });
+
+    heartForm.addEventListener('submit', function () {
+      loadingOverlay.style.display = 'flex';
     });
   </script>
 
