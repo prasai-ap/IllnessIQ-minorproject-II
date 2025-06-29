@@ -17,8 +17,10 @@ urlpatterns = [
     path('report-issue/',views.report_issue,name='report_issue'),
     path('predict_diabetes/', views.predict_diabetes, name='predict_diabetes'),
     path('predict_heart/', views.predict_heart, name='predict_heart'),
-    path('predict_liver/',views.predict_liver, name='predict_liver'),
+    path('predict_liver/', views.predict_liver, name='predict_liver'),
+    path('predict_thyroid/', views.predict_thyroid, name='predict_thyroid'),
     path('download_diabetes_report/<int:dr_id>/', views.download_diabetes_report, name='download_diabetes_report'),
     path('download_heart_report/<int:hr_id>/', views.download_heart_report, name='download_heart_report'),
     path('download_liver_report/<int:lr_id>/', views.download_liver_report, name='download_liver_report'),
+    path('download_thyroid_report/<int:tr_id>/', views.download_thyroid_report, name='download_thyroid_report'),
 ]

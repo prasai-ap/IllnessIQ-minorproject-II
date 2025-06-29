@@ -237,6 +237,7 @@ def report_issue(request):
 diabetes_model = os.path.join(settings.BASE_DIR, 'illnessiq_app', 'ml_models', 'diabetes_model.pkl')
 heart_model = os.path.join(settings.BASE_DIR, 'illnessiq_app', 'ml_models', 'heart_model.pkl')
 liver_model = os.path.join(settings.BASE_DIR, 'illnessiq_app', 'ml_models', 'liver_model.pkl')
+thyroid_model = os.path.join(settings.BASE_DIR, 'illnessiq_app', 'ml_models', 'thyroid_model.pkl')
 
 gender_map = {'Male': 1, 'Female': 0}
 hypertension_map = {'Yes': 1, 'No': 0}
@@ -565,6 +566,99 @@ def predict_liver(request):
                 'recommendations': ["<p>Please try again later or contact technical support.</p>"]
             })
 
+def predict_thyroid(request):
+    if not request.session.get('user_id'):
+        return redirect('login')
+
+    try:
+        model = joblib.load(thyroid_model)
+    except FileNotFoundError:
+        return render(request, 'thyroid_risk_result.html', {
+            'result': "Error: Thyroid model not found.",
+            'recommendations': ["<p>Please contact support to resolve the system configuration issue.</p>"]
+        })
+    except Exception as e:
+        return render(request, 'thyroid_risk_result.html', {
+            'result': f"Error loading model: {str(e)}",
+            'recommendations': ["<p>An unexpected error occurred. Please contact support.</p>"]
+        })
+
+    user_id = request.session.get('user_id')
+
+    if request.method == 'POST':
+        try:
+            patient_name = request.POST.get('Patient_Name')
+            age = int(request.POST.get('Age'))
+            gender = request.POST.get('Gender')
+            tsh = float(request.POST.get('TSH'))
+            ft4 = float(request.POST.get('FT4'))
+            ft3 = float(request.POST.get('FT3'))
+
+            gender_encoded = 1 if gender.lower() == 'male' else 0
+
+            input_data = pd.DataFrame([{
+                'age': age,
+                'gender': gender_encoded,
+                'TSH': tsh,
+                'T3': ft3,
+                'T4': ft4
+            }])
+
+            prediction = model.predict(input_data)[0]
+            result = "High Risk" if prediction == 1 else "Low Risk"
+
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    INSERT INTO thyroid_medical_details (u_id, age, gender, tsh, ft4, ft3, patient_name)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING t_id
+                """, [user_id, age, gender, tsh, ft4, ft3, patient_name])
+                t_id = cursor.fetchone()[0]
+
+                cursor.execute("""
+                    INSERT INTO thyroid_risk (risk_status, t_id)
+                    VALUES (%s, %s) RETURNING tr_id
+                """, [result, t_id])
+                tr_id = cursor.fetchone()[0]
+
+            prompt = f"""Based on the following user data, provide personalized health recommendations for thyroid disease risk management.
+            The user is a {gender.lower()} aged {age} with a {result} of thyroid disease.
+            Key metrics: TSH = {tsh}, FT4 = {ft4}, FT3 = {ft3}.
+
+            Structure your response with clear headings for categories like "Summary of Risk", "Lifestyle Recommendations", "Dietary Advice", and "Medical Considerations".
+            Use bullet points for individual recommendations within each category.
+            Start directly with the recommendations, no introductory sentences before the first heading.
+            """
+
+            model_gemini = genai.GenerativeModel('gemini-2.5-flash')
+            response = model_gemini.generate_content(prompt)
+            recommendation_text = response.text.strip()
+
+            sections = [s.strip() for s in recommendation_text.split("\n\n") if s.strip()]
+            recommendations = [markdown.markdown(section) for section in sections]
+
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    INSERT INTO thyroid_recommendation (tr_id, recommendation)
+                    VALUES (%s, %s)
+                """, [tr_id, recommendation_text])
+
+            return render(request, 'thyroid_risk_result.html', {
+                'result': result,
+                'recommendations': recommendations,
+                'tr_id': tr_id
+            })
+
+        except ValueError as ve:
+            return render(request, 'thyroid_risk_result.html', {
+                'result': f"Input Error: {str(ve)}",
+                'recommendations': ["<p>Please check the values and ensure all fields are filled correctly.</p>"]
+            })
+        except Exception as e:
+            return render(request, 'thyroid_risk_result.html', {
+                'result': f"An unexpected error occurred: {str(e)}",
+                'recommendations': ["<p>Please try again later or contact technical support.</p>"]
+            })
+
 
 def download_diabetes_report(request, dr_id):
     if not request.session.get('user_id'):
@@ -714,3 +808,52 @@ def download_liver_report(request, lr_id):
         return HttpResponse("PDF generation failed", status=500)
 
     return response
+
+def download_thyroid_report(request, tr_id):
+    if not request.session.get('user_id'):
+        return redirect('login')
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT t.patient_name, t.age, t.gender, t.tsh, t.ft4, t.ft3,
+                   r.risk_status, rec.recommendation
+            FROM thyroid_medical_details t
+            JOIN thyroid_risk r ON t.t_id = r.t_id
+            JOIN thyroid_recommendation rec ON r.tr_id = rec.tr_id
+            WHERE r.tr_id = %s
+        """, [tr_id])
+        row = cursor.fetchone()
+
+    if not row:
+        return HttpResponse("No data found", status=404)
+
+    logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'logo.png')
+    static_url = f'file://{logo_path.rsplit("/", 1)[0]}/'
+
+    context = {
+        'patient_name': row[0],
+        'age': row[1],
+        'gender': row[2],
+        'tsh': row[3],
+        'ft4': row[4],
+        'ft3': row[5],
+        'risk_status': row[6],
+        'recommendation_html': markdown.markdown(row[7] or ""),
+        'date': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'STATIC_URL': static_url
+    }
+
+    template = get_template("thyroid_report_template.html")
+    html = template.render(context)
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="Thyroid_Report_{context["patient_name"]}.pdf"'
+
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+        return HttpResponse("PDF generation failed", status=500)
+
+    return response
+
+
+    
