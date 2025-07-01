@@ -1,0 +1,88 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Medical History | IllnessIQ</title>
+    <link rel="stylesheet" href="{% static 'css/history.css' %}" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <a href="{% url 'user_dashboard' %}">
+                <img src="{% static 'images/logo.png' %}" alt="IllnessIQ Logo">
+            </a>
+        </div>
+        <div class="dropdown">
+            <button class="dropdown-toggle" id="dropdownBtn">👤</button>
+            <ul class="dropdown-menu" id="dropdownMenu">
+                <li><a href="{% url 'history' %}">History</a></li>
+                <li><a href="{% url 'feedback' %}">Feedback</a></li>
+                <li><a href="{% url 'report_issue' %}">Report Issue</a></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="history-container">
+        <h1>Medical History</h1>
+
+        {% if filter_applied %}
+            <p class="info-text">Filtered results from <strong>{{ from_date }}</strong> to <strong>{{ to_date }}</strong></p>
+        {% else %}
+            <p class="info-text">Showing all records.</p>
+        {% endif %}
+
+        <form method="get" class="filter-form">
+            <label>From:
+                <input type="date" name="from_date" value="{{ from_date }}" max="{{ today }}">
+            </label>
+            <label>To:
+                <input type="date" name="to_date" value="{{ to_date }}" max="{{ today }}">
+            </label>
+            <button type="submit">Filter</button>
+        </form>
+
+        {% for disease, records in history.items %}
+            {% if records %}
+                <section class="history-section">
+                    <h2>{{ disease|title }} History</h2>
+                    <div class="card-grid">
+                        {% for rec in records %}
+                            <a href="{% url 'download_'|add:disease|add:'_report' rec.0 %}" class="history-card" download>
+                                <p><strong>Name:</strong> {{ rec.1 }}</p>
+                                <p><strong>Age:</strong> {{ rec.2 }}</p>
+                                <p><strong>Gender:</strong> {{ rec.3 }}</p>
+                                <p><strong>Risk:</strong> {{ rec.4 }}</p>
+                                <p><strong>Date:</strong> {{ rec.5 }}</p>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+        {% endfor %}
+    </main>
+
+    <script>
+        const dropdownBtn = document.getElementById('dropdownBtn');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+
+        dropdownBtn.addEventListener('click', () => {
+            dropdownMenu.classList.toggle('show');
+        });
+
+        window.addEventListener('click', (e) => {
+            if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.classList.remove('show');
+            }
+        });
+
+        // Prevent future dates
+        const today = new Date().toISOString().split('T')[0];
+        document.querySelectorAll("input[type='date']").forEach(input => {
+            input.setAttribute('max', today);
+        });
+    </script>
+</body>
+</html>

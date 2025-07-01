@@ -23,4 +23,5 @@ urlpatterns = [
     path('download_heart_report/<int:hr_id>/', views.download_heart_report, name='download_heart_report'),
     path('download_liver_report/<int:lr_id>/', views.download_liver_report, name='download_liver_report'),
     path('download_thyroid_report/<int:tr_id>/', views.download_thyroid_report, name='download_thyroid_report'),
+    path('history/', views.history_view, name='history'),
 ]

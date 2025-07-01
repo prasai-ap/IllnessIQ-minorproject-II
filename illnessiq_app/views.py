@@ -3,6 +3,7 @@ from django.db import connection ,IntegrityError
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 import random ,datetime
+from datetime import date
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
@@ -294,15 +295,16 @@ def predict_diabetes(request):
             input_data = pd.DataFrame([input_values], columns=model_features)
             prediction = model.predict(input_data)[0]
             result = "High Risk" if prediction == 1 else "Low Risk"
+            today = date.today()
 
             with connection.cursor() as cursor:
                 cursor.execute("""
                     INSERT INTO diabetes_medical_details 
-                    (u_id, patient_name, age, gender, hypertension, heart_diseases, smoking_history, bmi, hba1c, blood_glucose)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING d_id
+                    (u_id, patient_name, age, gender, hypertension, heart_diseases, smoking_history, bmi, hba1c, blood_glucose,entry_date)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING d_id
                 """, [
                     user, patient_name, age, gender, hypertension, heart_disease,
-                    smoking_status, bmi, hba1c, glucose
+                    smoking_status, bmi, hba1c, glucose, today
                 ])
                 d_id = cursor.fetchone()[0]
 
@@ -397,13 +399,14 @@ def predict_heart(request):
 
             prediction = model.predict(input_data)[0]
             result = "High Risk" if prediction == 1 else "Low Risk"
+            today = date.today()
 
             with connection.cursor() as cursor:
                 cursor.execute("""
                     INSERT INTO heart_medical_details 
-                    (u_id, patient_name, age, gender, cholesterol, high_blood_sugar, heart_rate)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING h_id
-                """, [user_id, patient_name, age, gender, cholesterol, fasting_blood_sugar, heart_rate])
+                    (u_id, patient_name, age, gender, cholesterol, high_blood_sugar, heart_rate, entry_date)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING h_id
+                """, [user_id, patient_name, age, gender, cholesterol, fasting_blood_sugar, heart_rate, today])
                 h_id = cursor.fetchone()[0]
 
                 cursor.execute("""
@@ -509,15 +512,16 @@ def predict_liver(request):
             
             prediction = model.predict(input_data)[0]
             result = "High Risk" if prediction == 1 else "Low Risk"
+            today=date.today()
 
             with connection.cursor() as cursor:
                 cursor.execute("""
                     INSERT INTO liver_medical_details 
-                    (u_id, patient_name, age, gender, bilirubin_total, bilirubin_direct, sgot, sgpt, alkaline_phosphatase, protein, albumin, ag_ratio)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    (u_id, patient_name, age, gender, bilirubin_total, bilirubin_direct, sgot, sgpt, alkaline_phosphatase, protein, albumin, ag_ratio, entry_date)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     RETURNING l_id
                 """, [
-                    user_id, patient_name, age, gender, tb, db, sgot, sgpt, alkp, protein, albumin, ag_ratio
+                    user_id, patient_name, age, gender, tb, db, sgot, sgpt, alkp, protein, albumin, ag_ratio, today
                 ])
                 l_id = cursor.fetchone()[0]
 
@@ -606,12 +610,13 @@ def predict_thyroid(request):
 
             prediction = model.predict(input_data)[0]
             result = "High Risk" if prediction == 1 else "Low Risk"
+            today=date.today()
 
             with connection.cursor() as cursor:
                 cursor.execute("""
-                    INSERT INTO thyroid_medical_details (u_id, age, gender, tsh, ft4, ft3, patient_name)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING t_id
-                """, [user_id, age, gender, tsh, ft4, ft3, patient_name])
+                    INSERT INTO thyroid_medical_details (u_id, age, gender, tsh, ft4, ft3, patient_name, entry_date)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING t_id
+                """, [user_id, age, gender, tsh, ft4, ft3, patient_name, today])
                 t_id = cursor.fetchone()[0]
 
                 cursor.execute("""
@@ -856,4 +861,72 @@ def download_thyroid_report(request, tr_id):
     return response
 
 
-    
+from datetime import date
+from django.shortcuts import render, redirect
+from django.db import connection
+
+def history_view(request):
+    if not request.session.get('user_id'):
+        return redirect('login')
+
+    user_id = request.session['user_id']
+    from_date = request.GET.get('from_date')
+    to_date = request.GET.get('to_date')
+
+    filter_applied = from_date and to_date
+
+    if not filter_applied:
+        from_date = '2000-01-01'
+        to_date_obj = date.today()
+        to_date = to_date_obj.strftime('%Y-%m-%d')
+    else:
+        to_date_obj = date.fromisoformat(to_date)
+
+    history_data = {}
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT t.t_id, t.patient_name, t.age, t.gender, tr.risk_status, t.entry_date
+            FROM thyroid_medical_details t
+            JOIN thyroid_risk tr ON t.t_id = tr.t_id
+            WHERE t.u_id = %s AND t.entry_date BETWEEN %s AND %s
+            ORDER BY t.entry_date DESC
+        """, [user_id, from_date, to_date])
+        history_data['thyroid'] = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT l.l_id, l.patient_name, l.age, l.gender, lr.risk_status, l.entry_date
+            FROM liver_medical_details l
+            JOIN liver_risk lr ON l.l_id = lr.l_id
+            WHERE l.u_id = %s AND l.entry_date BETWEEN %s AND %s
+            ORDER BY l.entry_date DESC
+        """, [user_id, from_date, to_date])
+        history_data['liver'] = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT h.h_id, h.patient_name, h.age, h.gender, hr.risk_status, h.entry_date
+            FROM heart_medical_details h
+            JOIN heart_risk hr ON h.h_id = hr.h_id
+            WHERE h.u_id = %s AND h.entry_date BETWEEN %s AND %s
+            ORDER BY h.entry_date DESC
+        """, [user_id, from_date, to_date])
+        history_data['heart'] = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT d.d_id, d.patient_name, d.age, d.gender, dr.risk_status, d.entry_date
+            FROM diabetes_medical_details d
+            JOIN diabetes_risk dr ON d.d_id = dr.d_id
+            WHERE d.u_id = %s AND d.entry_date BETWEEN %s AND %s
+            ORDER BY d.entry_date DESC
+        """, [user_id, from_date, to_date])
+        history_data['diabetes'] = cursor.fetchall()
+
+    return render(request, 'history.html', {
+        'history': history_data,
+        'from_date': from_date,
+        'to_date': to_date,
+        'filter_applied': filter_applied,
+        'today': date.today().strftime('%Y-%m-%d') 
+    })
+
+
