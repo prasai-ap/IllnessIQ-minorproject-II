@@ -4,11 +4,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{{ data.Disease }} History Detail | IllnessIQ</title>
+  <title>Heart Risk Prediction Result | IllnessIQ</title>
   <link rel="stylesheet" href="{% static 'css/result.css' %}" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
+
 
   <nav class="navbar">
     <div class="logo">
@@ -19,7 +20,7 @@
     <div class="dropdown">
       <button class="dropdown-toggle" id="dropdownBtn">👤</button>
       <ul class="dropdown-menu" id="dropdownMenu">
-        <li><a href="{% url 'history' %}">History</a></li>
+        <li><a href="#">History</a></li>
         <li><a href="{% url 'feedback' %}">Feedback</a></li>
         <li><a href="{% url 'report_issue' %}">Report Issue</a></li>
         <li><a href="{% url 'logout' %}">Logout</a></li>
@@ -27,35 +28,22 @@
     </div>
   </nav>
 
+  <div class="save-button-container">
+    <a href="{% url 'download_diabetes_report' dr_id %}" class="save-button">Save</a>
+  </div>
+
   <main class="result-container">
 
     <div class="result-card summary-card">
-      <h2>{{ data.Disease }} Risk Record Summary</h2>
-      <p><strong>Patient:</strong> {{ data.Name }}</p>
-      <p><strong>Age:</strong> {{ data.Age }}</p>
-      <p><strong>Gender:</strong> {{ data.Gender }}</p>
-      <p><strong>Date:</strong> {{ data.Entry Date }}</p>
-      <p class="risk-level {% if data.'Risk Status' == 'High Risk' %}high-risk{% else %}low-risk{% endif %}">
-        {{ data."Risk Status" }}
+      <h2>Diabetes Risk Prediction Result</h2>
+      <p class="risk-level {% if result == 'High Risk' %}high-risk{% else %}low-risk{% endif %}">
+        {{ result }}
       </p>
-    </div>
-
-    <div class="result-card input-detail-section">
-      <h3>Medical Inputs</h3>
-      <div class="recommendation-cards">
-        {% for key, value in data.items %}
-          {% if key not in ['Disease', 'Name', 'Age', 'Gender', 'Risk Status', 'Entry Date'] %}
-            <div class="recommendation-card">
-              <strong>{{ key }}:</strong> {{ value }}
-            </div>
-          {% endif %}
-        {% endfor %}
-      </div>
     </div>
 
     {% if recommendations %}
     <div class="result-card recommendation-section">
-      <h3>AI-Based Health Recommendations</h3>
+      <h3>Personalized Diabetes Recommendations</h3>
       <div class="recommendation-cards">
         {% for rec in recommendations %}
           <div class="recommendation-card">
@@ -66,7 +54,7 @@
     </div>
     {% else %}
     <div class="result-card no-recommendations">
-      <p>No specific recommendations available for this record.</p>
+      <p>No specific recommendations available at this time.</p>
     </div>
     {% endif %}
 
