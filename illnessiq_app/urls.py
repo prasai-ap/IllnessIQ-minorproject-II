@@ -24,4 +24,5 @@ urlpatterns = [
     path('download_liver_report/<int:lr_id>/', views.download_liver_report, name='download_liver_report'),
     path('download_thyroid_report/<int:tr_id>/', views.download_thyroid_report, name='download_thyroid_report'),
     path('history/', views.history_view, name='history'),
+    path('history/<str:disease>/<int:record_id>/', views.view_history_detail, name='view_history_detail'),
 ]

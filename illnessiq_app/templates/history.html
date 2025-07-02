@@ -50,7 +50,7 @@
                     <h2>{{ disease|title }} History</h2>
                     <div class="card-grid">
                         {% for rec in records %}
-                            <a href="{% url 'download_'|add:disease|add:'_report' rec.0 %}" class="history-card" download>
+                            <a href="{% url 'view_history_detail' disease=disease record_id=rec.0 %}" class="history-card">
                                 <p><strong>Name:</strong> {{ rec.1 }}</p>
                                 <p><strong>Age:</strong> {{ rec.2 }}</p>
                                 <p><strong>Gender:</strong> {{ rec.3 }}</p>
@@ -78,7 +78,6 @@
             }
         });
 
-        // Prevent future dates
         const today = new Date().toISOString().split('T')[0];
         document.querySelectorAll("input[type='date']").forEach(input => {
             input.setAttribute('max', today);

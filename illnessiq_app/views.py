@@ -861,10 +861,6 @@ def download_thyroid_report(request, tr_id):
     return response
 
 
-from datetime import date
-from django.shortcuts import render, redirect
-from django.db import connection
-
 def history_view(request):
     if not request.session.get('user_id'):
         return redirect('login')
@@ -930,3 +926,168 @@ def history_view(request):
     })
 
 
+def parse_markdown_sections(text):
+    sections = [s.strip() for s in text.strip().split("\n\n") if s.strip()]
+    return [markdown.markdown(section) for section in sections]
+
+def view_history_detail(request, disease, record_id):
+    if not request.session.get('user_id'):
+        return redirect('login')
+
+    user_id = request.session['user_id']
+    data = None
+    recommendations = []
+
+    with connection.cursor() as cursor:
+        if disease == 'thyroid':
+            report_download_url_name = f"download_{disease}_report"
+
+            cursor.execute("""
+                SELECT t.patient_name, t.age, t.gender, t.tsh, t.ft4, t.ft3,
+                       tr.risk_status, t.entry_date
+                FROM thyroid_medical_details t
+                JOIN thyroid_risk tr ON t.t_id = tr.t_id
+                WHERE t.u_id = %s AND t.t_id = %s
+            """, [user_id, record_id])
+            row = cursor.fetchone()
+
+            cursor.execute("""
+                SELECT recommendation
+                FROM thyroid_recommendation
+                WHERE tr_id = (SELECT tr_id FROM thyroid_risk WHERE t_id = %s)
+            """, [record_id])
+            raw_rec = cursor.fetchone()
+            if raw_rec:
+                recommendations = parse_markdown_sections(raw_rec[0])
+
+            if row:
+                data = {
+                    'Disease': 'Thyroid',
+                    'Name': row[0],
+                    'Age': row[1],
+                    'Gender': row[2],
+                    'TSH': row[3],
+                    'FT4': row[4],
+                    'FT3': row[5],
+                    'Risk Status': row[6],
+                    'Entry Date': row[7],
+                }
+
+        elif disease == 'liver':
+            report_download_url_name = f"download_{disease}_report"
+
+            cursor.execute("""
+                SELECT l.patient_name, l.age, l.gender, l.bilirubin_total, l.bilirubin_direct,
+                       l.sgot, l.sgpt, l.alkaline_phosphatase, l.protein, l.albumin,
+                       l.ag_ratio, lr.risk_status, l.entry_date
+                FROM liver_medical_details l
+                JOIN liver_risk lr ON l.l_id = lr.l_id
+                WHERE l.u_id = %s AND l.l_id = %s
+            """, [user_id, record_id])
+            row = cursor.fetchone()
+
+            cursor.execute("""
+                SELECT recommendation
+                FROM liver_recommendation
+                WHERE lr_id = (SELECT lr_id FROM liver_risk WHERE l_id = %s)
+            """, [record_id])
+            raw_rec = cursor.fetchone()
+            if raw_rec:
+                recommendations = parse_markdown_sections(raw_rec[0])
+
+            if row:
+                data = {
+                    'Disease': 'Liver',
+                    'Name': row[0],
+                    'Age': row[1],
+                    'Gender': row[2],
+                    'Total Bilirubin': row[3],
+                    'Direct Bilirubin': row[4],
+                    'SGOT': row[5],
+                    'SGPT': row[6],
+                    'Alkaline Phosphatase': row[7],
+                    'Protein': row[8],
+                    'Albumin': row[9],
+                    'A/G Ratio': row[10],
+                    'Risk Status': row[11],
+                    'Entry Date': row[12],
+                }
+
+        elif disease == 'heart':
+            report_download_url_name = f"download_{disease}_report"
+
+            cursor.execute("""
+                SELECT h.patient_name, h.age, h.gender, h.heart_rate, h.cholesterol,
+                       h.high_blood_sugar, hr.risk_status, h.entry_date
+                FROM heart_medical_details h
+                JOIN heart_risk hr ON h.h_id = hr.h_id
+                WHERE h.u_id = %s AND h.h_id = %s
+            """, [user_id, record_id])
+            row = cursor.fetchone()
+
+            cursor.execute("""
+                SELECT recommendation
+                FROM heart_recommendation
+                WHERE hr_id = (SELECT hr_id FROM heart_risk WHERE h_id = %s)
+            """, [record_id])
+            raw_rec = cursor.fetchone()
+            if raw_rec:
+                recommendations = parse_markdown_sections(raw_rec[0])
+
+            if row:
+                data = {
+                    'Disease': 'Heart',
+                    'Name': row[0],
+                    'Age': row[1],
+                    'Gender': row[2],
+                    'Heart Rate': row[3],
+                    'Cholesterol': row[4],
+                    'High Blood Sugar': row[5],
+                    'Risk Status': row[6],
+                    'Entry Date': row[7],
+                }
+
+        elif disease == 'diabetes':
+            report_download_url_name = f"download_{disease}_report"
+            
+            cursor.execute("""
+                SELECT d.patient_name, d.age, d.gender, d.hypertension, d.heart_diseases,
+                       d.smoking_history, d.bmi, d.hba1c, d.blood_glucose,
+                       dr.risk_status, d.entry_date
+                FROM diabetes_medical_details d
+                JOIN diabetes_risk dr ON d.d_id = dr.d_id
+                WHERE d.u_id = %s AND d.d_id = %s
+            """, [user_id, record_id])
+            row = cursor.fetchone()
+
+            cursor.execute("""
+                SELECT recommendation
+                FROM diabetes_recommendation
+                WHERE dr_id = (SELECT dr_id FROM diabetes_risk WHERE d_id = %s)
+            """, [record_id])
+            raw_rec = cursor.fetchone()
+            if raw_rec:
+                recommendations = parse_markdown_sections(raw_rec[0])
+
+            if row:
+                data = {
+                    'Disease': 'Diabetes',
+                    'Name': row[0],
+                    'Age': row[1],
+                    'Gender': row[2],
+                    'Hypertension': row[3],
+                    'Heart Diseases': row[4],
+                    'Smoking History': row[5],
+                    'BMI': row[6],
+                    'HbA1c': row[7],
+                    'Blood Glucose': row[8],
+                    'Risk Status': row[9],
+                    'Entry Date': row[10],
+                }
+
+    return render(request, 'history_detail.html', {
+        'data': data,
+        'recommendations': recommendations,
+        'record_id': record_id,
+        'report_url_name': report_download_url_name
+    })
