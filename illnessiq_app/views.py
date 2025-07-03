@@ -60,8 +60,8 @@ def login(request):
     return render(request, 'login.html')
 
 def verify_otp(request):
-    if not request.session.get('otp_user_id'):
-        return redirect('login')
+    # if not request.session.get('otp_user_id'):
+    #     return redirect('login')
 
     user_id = request.session.get('otp_user_id')
     email = request.session.get('otp_user_email')

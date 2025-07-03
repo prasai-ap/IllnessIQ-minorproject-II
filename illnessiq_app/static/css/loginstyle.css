@@ -6,12 +6,13 @@
 
 body {
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(to right, #74ebd5, #ACB6E5);
+  background: linear-gradient(to right, #cfd9df, #e2ebf0); /* Soft IllnessIQ-style gradient */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
 
 .messages {
   width: 100%;
@@ -30,6 +31,7 @@ body {
   margin-bottom: 10px;
 }
 
+
 .login-container {
   flex: 1;
   display: flex;
@@ -39,14 +41,15 @@ body {
   padding: 20px;
 }
 
+
 .login-box {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.20);
   backdrop-filter: blur(20px);
   padding: 35px;
   border-radius: 20px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 25px rgba(13, 71, 161, 0.2);
   text-align: center;
-  color: #fff;
+  color: #0d47a1;
   width: 100%;
   max-width: 400px;
   display: flex;
@@ -55,39 +58,48 @@ body {
 }
 
 .logo img {
-  width: 70px;
-  margin-bottom: 15px;
+  width: 180px;
+  margin-bottom: 10px;
 }
 
 h2 {
   margin-bottom: 25px;
   font-weight: 600;
   font-size: 24px;
-  color: #ffffff;
+  color: #0d47a1;
+}
+
+.login-box form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .login-box input[type="email"],
 .login-box input[type="text"] {
   width: 100%;
+  max-width: 340px;
   padding: 12px 16px;
   margin: 12px 0;
-  border: none;
+  border: 1px solid #bbdefb;
   border-radius: 12px;
-  background-color: rgba(255, 255, 255, 0.25);
-  color: #fff;
+  background-color: rgba(255, 255, 255, 0.5);
+  color: #0d47a1;
   font-size: 15px;
   outline: none;
 }
 
 .login-box input::placeholder {
-  color: rgba(255, 255, 255, 0.8);
+  color: #607d8b;
 }
 
 .btn-login {
   width: 100%;
+  max-width: 340px;
   padding: 14px;
-  background-color: #ffffff;
-  color: #0d47a1;
+  background-color: #0d47a1;
+  color: #ffffff;
   border: none;
   border-radius: 12px;
   font-size: 16px;
@@ -98,16 +110,16 @@ h2 {
 }
 
 .btn-login:hover {
-  background-color: #f0f0f0;
+  background-color: #1565c0;
 }
 
 .signup-text {
   margin-top: 20px;
-  color: #ffffff;
+  color: #0d47a1;
 }
 
 .signup-text a {
-  color: #ffeb3b;
+  color: #1976d2;
   text-decoration: none;
   font-weight: 500;
 }
@@ -115,6 +127,7 @@ h2 {
 .signup-text a:hover {
   text-decoration: underline;
 }
+
 
 @media (max-width: 480px) {
   .login-box {
