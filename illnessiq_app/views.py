@@ -33,6 +33,13 @@ def send_otp_email(user_email, otp):
         send_mail(subject, message, email_from, [user_email])
 
 def login(request):
+    if request.session.get('user_id') and request.session.get('user_role'):
+        role = request.session.get('user_role')
+        if role == "admin":
+            return redirect('admin_dashboard')
+        elif role == "users":
+            return redirect('user_dashboard')
+
     if request.method == 'POST':
         email = request.POST.get('email')
         with connection.cursor() as cursor:
@@ -60,8 +67,8 @@ def login(request):
     return render(request, 'login.html')
 
 def verify_otp(request):
-    # if not request.session.get('otp_user_id'):
-    #     return redirect('login')
+    if not request.session.get('otp_user_id'):
+        return redirect('login')
 
     user_id = request.session.get('otp_user_id')
     email = request.session.get('otp_user_email')
