@@ -7,55 +7,90 @@ body {
 
 .navbar {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     background-color: #ffffff;
-    padding: 15px 30px;
+    height: 70px;
+    padding: 0 2rem;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-
-.logo img {
-    height: 40px;
-}
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    position: relative;
+  }
+  
+  .logo {
+    position: absolute;
+    left: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 150px;
+    z-index: 1;
+  }
+  
+  .logo img {
+    height: 150px;
+    width: auto;
+    object-fit: contain;
+  }
 
 .dropdown {
     position: relative;
-}
-
-.dropdown-toggle {
-    background: none;
-    border: none;
-    font-size: 20px;
+  }
+  
+  .dropdown-toggle {
+    background-color: #f8f9fa;
+    color: #1d3557;
+    border: 1px solid #dee2e6;
+    font-size: 1rem;
+    padding: 0.6rem 1.1rem;
     cursor: pointer;
-}
-
-.dropdown-menu {
-    display: none;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+  }
+  
+  .dropdown-toggle:hover {
+    background-color: #e2e6ea;
+  }
+  
+  .dropdown-menu {
     position: absolute;
     right: 0;
-    top: 35px;
-    background-color: #fff;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    top: 120%;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
     list-style: none;
-    padding: 10px 0;
-    border-radius: 8px;
-    min-width: 150px;
-    z-index: 100;
-}
-
-.dropdown-menu li {
-    padding: 10px 20px;
-}
-
-.dropdown-menu li a {
+    padding: 0.5rem 0;
+    display: none;
+    z-index: 999;
+    min-width: 180px;
+  }
+  
+  .dropdown-menu li {
+    border-bottom: 1px solid #f1f1f1;
+  }
+  
+  .dropdown-menu li:last-child {
+    border-bottom: none;
+  }
+  
+  .dropdown-menu a {
+    display: block;
+    padding: 0.9rem 1.2rem;
+    color: #1d3557;
     text-decoration: none;
-    color: #333;
+    transition: background 0.3s;
+  }
+  
+  .dropdown-menu a:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .show {
     display: block;
-}
-
-.dropdown-menu.show {
-    display: block;
-}
+  }
 
 .container {
     max-width: 900px;
