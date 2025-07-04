@@ -28,6 +28,14 @@
   </nav>
 
   <main class="heart-form-wrapper">
+    {% if messages %}
+      <div class="error-box">
+          {% for message in messages %}
+          <p>{{ message }}</p>
+          {% endfor %}
+      </div>
+    {% endif %}
+    
     <form action="{% url 'predict_heart' %}" method="POST" class="heart-form" id="heartForm">
       <h2>Heart Risk Prediction Insights</h2>
       {% csrf_token %}

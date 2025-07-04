@@ -28,6 +28,15 @@
   </nav>
 
   <main class="thyroid-form-wrapper">
+    
+    {% if messages %}
+      <div class="error-box">
+        {% for message in messages %}
+          <p>{{ message }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+    
     <form action="/predict_thyroid/" method="POST" class="thyroid-form" id="thyroidForm">
       <h2>Thyroid Prediction Insights</h2>
       {% csrf_token %}
@@ -46,7 +55,7 @@
 
         <div class="form-group">
           <label for="gender">Gender</label>
-          <select id="gender" name="Gender">
+          <select id="gender" name="Gender" required>
             <option value="">-- Select Gender --</option>
             <option>Male</option>
             <option>Female</option>

@@ -11,7 +11,11 @@
 </head>
 <body>
   <nav class="navbar">
-    <div class="logo"><img src ="{% static 'images/logo.png'%}"></div>
+    <div class="logo">
+      <a href="{% url 'index'%}">
+      <img src="{% static 'images/logo.png' %}" alt="IllnessIQ Logo">
+      </a>
+    </div>
     <div class="dropdown">
         <button class="dropdown-toggle" id="dropdownBtn">👤</button>
         <ul class="dropdown-menu" id="dropdownMenu">
@@ -25,6 +29,7 @@
 
   <main class="dashboard">
     <h1>Welcome! Choose which risk would you like to predict:</h1>
+    
     <div class="card-container">
       <a href="{% url 'diabetes_risk' %}" class="card card-diabetes">
         <img src="{% static 'images/diabetes.jpg' %}" alt="Diabetes" />
@@ -43,20 +48,43 @@
         <p>Thyroid Disease Prediction</p>
       </a>
     </div>    
+
+    <section class="recent-activity">
+      <h2>Recent Activity</h2>
+      {% if recent_activities %}
+        <ul class="activity-list">
+          {% for act in recent_activities %}
+            <li>
+              <strong>{{ act.entry_date|date:"M d, Y" }}</strong> – 
+              <em>{{ act.disease }}</em> test for <b>{{ act.patient_name }}</b>: 
+              <span>{{ act.risk_status }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No recent activity found.</p>
+      {% endif %}
+    </section>
   </main>
-</body>
-<script>
+
+  <script>
     const dropdownBtn = document.getElementById('dropdownBtn');
     const dropdownMenu = document.getElementById('dropdownMenu');
-  
+
     dropdownBtn.addEventListener('click', () => {
       dropdownMenu.classList.toggle('show');
     });
-  
+
     window.addEventListener('click', (e) => {
       if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
         dropdownMenu.classList.remove('show');
       }
     });
   </script>
+  <footer class="footer">
+    <div class="footer-container">
+      <p>&copy; 2025 <strong>IllnessIQ</strong>. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
 </html>
