@@ -334,41 +334,38 @@ def predict_diabetes(request):
     user = request.session.get('user_id')
 
     if request.method == 'POST':
-        # Extract data
-        form_data = {
-            'Patient_Name': request.POST.get('Patient_Name'),
-            'Age': request.POST.get('Age'),
-            'Gender': request.POST.get('Gender'),
-            'Hypertension': request.POST.get('Hypertension'),
-            'Heart_Disease': request.POST.get('Heart_Disease'),
-            'Smoking_Status': request.POST.get('Smoking_Status'),
-            'BMI': request.POST.get('BMI'),
-            'HbA1c_Level': request.POST.get('HbA1c_Level'),
-            'Blood_Glucose_Level': request.POST.get('Blood_Glucose_Level')
-        }
+        patient_name = request.POST.get('Patient_Name')
+        age_raw = request.POST.get('Age')
+        gender = request.POST.get('Gender')
+        hypertension = request.POST.get('Hypertension')
+        heart_disease = request.POST.get('Heart_Disease')
+        smoking_status = request.POST.get('Smoking_Status')
+        bmi_raw = request.POST.get('BMI')
+        hba1c_raw = request.POST.get('HbA1c_Level')
+        glucose_raw = request.POST.get('Blood_Glucose_Level')
 
-        if not all(form_data.values()):
-            request.session['diabetes_form_data'] = form_data
+        
+        if not all([patient_name, age_raw, gender, hypertension, heart_disease, smoking_status, bmi_raw, hba1c_raw, glucose_raw]):
             messages.error(request, "All fields are required. Please fill them out.")
-            return redirect('diabetes_risk')
+            return redirect('diabetes_risk') 
 
+    
         try:
-            age = int(form_data['Age'])
-            bmi = float(form_data['BMI'])
-            hba1c = float(form_data['HbA1c_Level'])
-            glucose = float(form_data['Blood_Glucose_Level'])
+            age = int(age_raw)
+            bmi = float(bmi_raw)
+            hba1c = float(hba1c_raw)
+            glucose = float(glucose_raw)
         except ValueError:
-            request.session['diabetes_form_data'] = form_data
             messages.error(request, "Please enter valid numeric values for age, BMI, HbA1c, and glucose.")
-            return redirect('diabetes_risk')
+            return redirect(request, 'diabetes_risk')
 
         try:
             input_data = pd.DataFrame([{
-                'gender': gender_map.get(form_data['Gender']),
+                'gender': gender_map.get(gender),
                 'age': age,
-                'hypertension': hypertension_map.get(form_data['Hypertension']),
-                'heart_disease': heart_disease_map.get(form_data['Heart_Disease']),
-                'smoking_history': smoking_map.get(form_data['Smoking_Status']),
+                'hypertension': hypertension_map.get(hypertension),
+                'heart_disease': heart_disease_map.get(heart_disease),
+                'smoking_history': smoking_map.get(smoking_status),
                 'bmi': bmi,
                 'HbA1c_level': hba1c,
                 'blood_glucose_level': glucose
@@ -382,15 +379,16 @@ def predict_diabetes(request):
                 cursor.execute("""INSERT INTO diabetes_medical_details 
                     (u_id, patient_name, age, gender, hypertension, heart_diseases, smoking_history, bmi, hba1c, blood_glucose, entry_date)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING d_id""",
-                    [user, form_data['Patient_Name'], age, form_data['Gender'], form_data['Hypertension'], form_data['Heart_Disease'], form_data['Smoking_Status'], bmi, hba1c, glucose, today])
+                    [user, patient_name, age, gender, hypertension, heart_disease, smoking_status, bmi, hba1c, glucose, today])
                 d_id = cursor.fetchone()[0]
 
                 cursor.execute("INSERT INTO diabetes_risk (risk_status, d_id) VALUES (%s, %s) RETURNING dr_id", [result, d_id])
                 dr_id = cursor.fetchone()[0]
+
             prompt = f"""Based on the following user data, provide personalized health recommendations for diabetes risk management.
-            The user is a {form_data['Gender'].lower()} aged {age} with a {result} of diabetes.
+            The user is a {gender.lower()} aged {age} with a {result} of diabetes.
             Key metrics: BMI = {bmi}, HbA1c = {hba1c}, Blood Glucose = {glucose}.
-            Health history: Smoking Status = {form_data['Smoking_Status']}, Hypertension = {form_data['Hypertension']}, Heart Disease = {form_data['Heart_Disease']}.
+            Health history: Smoking Status = {smoking_status}, Hypertension = {hypertension}, Heart Disease = {heart_disease}.
 
             Structure your response with clear headings for categories like "Summary of Risk", "Lifestyle Recommendations", "Dietary Advice", and "Medical Considerations".
             Use bullet points for individual recommendations within each category.
@@ -406,8 +404,6 @@ def predict_diabetes(request):
             with connection.cursor() as cursor:
                 cursor.execute("INSERT INTO diabetes_recommendation (dr_id, recommendation) VALUES (%s, %s)", [dr_id, recommendation_text])
 
-            request.session.pop('diabetes_form_data', None)
-
             return render(request, 'diabetes_risk_result.html', {
                 'result': result,
                 'recommendations': recommendations,
@@ -419,15 +415,6 @@ def predict_diabetes(request):
                 'result': f"Unexpected error: {str(e)}",
                 'recommendations': ["<p>An unexpected issue occurred. Please try again later.</p>"]
             })
-
-    else:
-        context = {
-            'form_data': request.session.pop('diabetes_form_data', {})
-        }
-        return render(request, 'diabetesrisk.html', context)
-
-
-
 
 def predict_heart(request):
     if not request.session.get('user_id'):
