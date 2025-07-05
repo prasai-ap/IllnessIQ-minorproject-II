@@ -151,10 +151,9 @@ body {
 
 
 .footer {
-  background-color: #c1e8ff;
+  background-color: #8dd1f1;
   color: #000000;
   text-align: center;
-  padding: 1rem 20px;
-  margin-top: 60px;
+  padding: 1rem 0;
   font-size: 0.9rem;
 }

@@ -208,3 +208,11 @@ button[type="submit"] {
   text-align: center;
   font-weight: 600;
 }
+
+.footer {
+  background-color: #8dd1f1;
+  color: #000000;
+  text-align: center;
+  padding: 1rem 0;
+  font-size: 0.9rem;
+}

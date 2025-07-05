@@ -450,8 +450,10 @@ def predict_heart(request):
             fbs_encoded = 1 if fbs.lower() == 'yes' else 0
 
             input_data = pd.DataFrame([{
-                'age': age, 'gender': gender_encoded,
-                'chol': cholesterol, 'fbs': fbs_encoded,
+                'age': age, 
+                'gender': gender_encoded,
+                'chol': cholesterol, 
+                'fbs': fbs_encoded,
                 'thalach': heart_rate
             }])
 
@@ -472,7 +474,7 @@ def predict_heart(request):
             
             prompt = f"""Based on the following user data, provide personalized health recommendations for heart disease risk management.
             The user is a {gender.lower()} aged {age} with a {result} of heart disease.
-            Key metrics: cholesterol = {cholesterol}, high fasting blood sugar = {fasting_blood_sugar}, heart rate = {heart_rate}.
+            Key metrics: cholesterol = {cholesterol}, high fasting blood sugar = {fbs}, heart rate = {heart_rate}.
 
             Structure your response with clear headings for categories like "Summary of Risk", "Lifestyle Recommendations", "Dietary Advice", and "Medical Considerations".
             Use bullet points for individual recommendations within each category.
@@ -531,17 +533,27 @@ def predict_liver(request):
                 messages.error(request, "All fields are required.")
                 return redirect('liver_risk')
 
+            age = int(age_raw) 
+            tb = float(tb)
+            db = float(db)
+            alkp = float(alkp)
+            sgpt = float(sgpt)
+            sgot = float(sgot)
+            protein = float(protein)
+            albumin = float(albumin)
+            ag_ratio = float(ag_ratio)
+
             input_data = pd.DataFrame([{
-                'Age': int(age_raw),
+                'Age ': age,
                 'Gender': 1 if gender.lower() == 'male' else 0,
-                'Total_Bilirubin': float(tb),
-                'Direct_Bilirubin': float(db),
-                'Alkaline_Phosphatase': float(alkp),
-                'Sgpt': float(sgpt),
-                'Sgot': float(sgot),
-                'Total_Proteins': float(protein),
-                'Albumin': float(albumin),
-                'A_G_Ratio': float(ag_ratio)
+                'Total_Bilirubin': tb,
+                'Direct_Bilirubin': db,
+                'Alkaline_Phosphatase': alkp,
+                'Sgpt': sgpt,
+                'Sgot ': sgot,
+                'Total_Proteins': protein,
+                ' Albumin': albumin,
+                'A_G_Ratio': ag_ratio
             }])
 
             prediction = model.predict(input_data)[0]
@@ -552,7 +564,7 @@ def predict_liver(request):
                 cursor.execute("""INSERT INTO liver_medical_details 
                     (u_id, patient_name, age, gender, bilirubin_total, bilirubin_direct, sgot, sgpt, alkaline_phosphatase, protein, albumin, ag_ratio, entry_date)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING l_id""",
-                    [user_id, patient_name, int(age_raw), gender, tb, db, sgot, sgpt, alkp, protein, albumin, ag_ratio, today])
+                    [user_id, patient_name, age, gender, tb, db, sgot, sgpt, alkp, protein, albumin, ag_ratio, today])
                 l_id = cursor.fetchone()[0]
 
                 cursor.execute("INSERT INTO liver_risk (risk_status, l_id) VALUES (%s, %s) RETURNING lr_id", [result, l_id])
@@ -613,12 +625,17 @@ def predict_thyroid(request):
                 messages.error(request, "All fields are required.")
                 return redirect('thyroid_risk')
 
+            age = int(age_raw)
+            tsh = float(tsh)
+            ft3 = float(ft3)
+            ft4 = float(ft4)
+            
             input_data = pd.DataFrame([{
-                'age': int(age_raw),
+                'age': age,
                 'gender': 1 if gender.lower() == 'male' else 0,
-                'TSH': float(tsh),
-                'T3': float(ft3),
-                'T4': float(ft4)
+                'TSH': tsh,
+                'T3': ft3,
+                'T4': ft4
             }])
 
             prediction = model.predict(input_data)[0]
@@ -628,7 +645,7 @@ def predict_thyroid(request):
             with connection.cursor() as cursor:
                 cursor.execute("""INSERT INTO thyroid_medical_details (u_id, age, gender, tsh, ft4, ft3, patient_name, entry_date)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING t_id""",
-                    [user_id, int(age_raw), gender, float(tsh), float(ft4), float(ft3), patient_name, today])
+                    [user_id, age, gender, tsh, ft4, ft3, patient_name, today])
                 t_id = cursor.fetchone()[0]
 
                 cursor.execute("INSERT INTO thyroid_risk (risk_status, t_id) VALUES (%s, %s) RETURNING tr_id", [result, t_id])

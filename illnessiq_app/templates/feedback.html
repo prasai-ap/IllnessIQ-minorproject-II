@@ -10,55 +10,65 @@
 </head>
 <body>
 
-  <nav class="navbar">
-    <div class="logo">
-      <a href="{% url 'user_dashboard' %}">
-        <img src="{% static 'images/logo.png' %}" alt="IllnessIQ Logo">
-      </a>
-    </div>
-    <div class="dropdown">
-      <button class="dropdown-toggle" id="dropdownBtn">👤</button>
-      <ul class="dropdown-menu" id="dropdownMenu">
-        <li><a href="{% url 'history' %}">History</a></li>
-        <li><a href="{% url 'report_issue' %}">Report Issue</a></li>
-        <li><a href="{% url 'logout' %}">Logout</a></li>
-      </ul>
-    </div>
-  </nav>
-  
-  {% if messages %}
-  <div class="messages">
-    {% for message in messages %}
-      <div class="message {{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-  </div>
-  {% endif %}
-  
-  <main class="feedback-wrapper">
-    <form action="{% url 'feedback' %}" method="POST" class="feedback-form">
-      {% csrf_token %}
-      <h2>We Value Your Feedback</h2>
+  <div class="page-container"> 
 
-      <div class="form-group">
-        <label for="rating">Rating</label>
-        <div class="star-select" id="starContainer">
-          <span class="star" data-value="1">★</span>
-          <span class="star" data-value="2">★</span>
-          <span class="star" data-value="3">★</span>
-          <span class="star" data-value="4">★</span>
-          <span class="star" data-value="5">★</span>
+    <nav class="navbar">
+      <div class="logo">
+        <a href="{% url 'user_dashboard' %}">
+          <img src="{% static 'images/logo.png' %}" alt="IllnessIQ Logo">
+        </a>
+      </div>
+      <div class="dropdown">
+        <button class="dropdown-toggle" id="dropdownBtn">👤</button>
+        <ul class="dropdown-menu" id="dropdownMenu">
+          <li><a href="{% url 'history' %}">History</a></li>
+          <li><a href="{% url 'report_issue' %}">Report Issue</a></li>
+          <li><a href="{% url 'logout' %}">Logout</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+        <div class="message {{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <main class="feedback-wrapper">
+      <form action="{% url 'feedback' %}" method="POST" class="feedback-form">
+        {% csrf_token %}
+        <h2>We Value Your Feedback</h2>
+
+        <div class="form-group">
+          <label for="rating">Rating</label>
+          <div class="star-select" id="starContainer">
+            <span class="star" data-value="1">★</span>
+            <span class="star" data-value="2">★</span>
+            <span class="star" data-value="3">★</span>
+            <span class="star" data-value="4">★</span>
+            <span class="star" data-value="5">★</span>
+          </div>
+          <input type="hidden" name="rating" id="ratingInput" required>
         </div>
-        <input type="hidden" name="rating" id="ratingInput" required>
-      </div>
 
-      <div class="form-group">
-        <label for="message">Feedback Message</label>
-        <textarea id="message" name="message" rows="5" placeholder="Write your suggestions, issues, or compliments..." required></textarea>
-      </div>
+        <div class="form-group">
+          <label for="message">Feedback Message</label>
+          <textarea id="message" name="message" rows="5" placeholder="Write your suggestions, issues, or compliments..." required></textarea>
+        </div>
 
-      <button type="submit">Submit Feedback</button>
-    </form>
-  </main>
+        <button type="submit">Submit Feedback</button>
+      </form>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        &copy; 2025 IllnessIQ. All rights reserved.
+      </div>
+    </footer>
+
+  </div> 
 
   <script>
     const dropdownBtn = document.getElementById('dropdownBtn');
@@ -73,6 +83,7 @@
         dropdownMenu.classList.remove('show');
       }
     });
+
     const stars = document.querySelectorAll('.star');
     const ratingInput = document.getElementById('ratingInput');
     let currentRating = 0;

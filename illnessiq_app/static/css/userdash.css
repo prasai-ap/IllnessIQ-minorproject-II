@@ -198,13 +198,11 @@ body {
 }
 
 .footer {
-  background-color: #ffffff;
-  padding: 1.5rem 2rem;
+  background-color: #8dd1f1;
+  color: #000000;
   text-align: center;
-  font-size: 0.95rem;
-  color: #1d3557;
-  border-top: 1px solid #e0e0e0;
-  margin-top: 3rem;
+  padding: 1rem 0;
+  font-size: 0.9rem;
 }
 
 .footer-container {

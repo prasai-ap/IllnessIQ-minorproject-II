@@ -197,7 +197,7 @@ body {
   line-height: 1.6;
 }
 
-/* FOOTER */
+
 .footer {
   background-color: #8dd1f1;
   color: #000000;
@@ -206,7 +206,7 @@ body {
   font-size: 0.9rem;
 }
 
-/* ANIMATION */
+
 .fade-in {
   animation: fadeInUp 1s ease-in-out both;
 }
@@ -222,7 +222,7 @@ body {
   }
 }
 
-/* RESPONSIVENESS */
+
 @media (max-width: 768px) {
   .two-columns {
     flex-direction: column;
