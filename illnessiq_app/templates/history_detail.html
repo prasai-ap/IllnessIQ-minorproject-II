@@ -33,7 +33,7 @@
     <main class="container">
         <h1>{{ data.Disease }} History Details</h1>
 
-        <table>
+        <table class="detail-table">
             {% for key, value in data.items %}
                 {% if key != 'Disease' %}
                 <tr>
@@ -54,10 +54,12 @@
                 {% endfor %}
             </div>
         {% else %}
-            <p>No recommendations available for this record.</p>
+            <div class="no-recommendation">
+                <p>No recommendations available for this record.</p>
+            </div>
         {% endif %}
+    </main>
 
-    </main>    
     <script>
         const dropdownBtn = document.getElementById('dropdownBtn');
         const dropdownMenu = document.getElementById('dropdownMenu');
