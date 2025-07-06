@@ -1,0 +1,75 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>All Predictions</title>
+  <link rel="stylesheet" href="{% static 'css/admin_tables.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="sidebar">
+  <div>
+    <div class="user-icon">
+      <i class="fas fa-user-circle fa-4x"></i>
+    </div>
+    <h2>Admin Panel</h2>
+    <ul>
+      <li><a href="{% url 'admin_dashboard' %}"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+      <li><a href="{% url 'view_users' %}"><i class="fas fa-users"></i> Users</a></li>
+      <li><a href="{% url 'view_predictions' %}"><i class="fas fa-dna"></i> Predictions</a></li>
+      <li><a href="{% url 'view_feedback' %}"><i class="fas fa-comments"></i> Feedback</a></li>
+      <li><a href="{% url 'view_issues' %}"><i class="fas fa-exclamation-circle"></i> Issues</a></li>
+      <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="main">
+  <h2>All Disease Predictions</h2>
+
+  <div class="search-bar">
+      <input type="text" id="predictionSearch" placeholder="Search by disease or patient...">
+  </div>
+
+  <div class="table-container">
+    <table id="predictionTable">
+      <thead>
+        <tr>
+          <th>Disease</th>
+          <th>Patient Name</th>
+          <th>Age</th>
+          <th>Gender</th>
+          <th>Risk Status</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in predictions %}
+        <tr>
+          <td>{{ row.0 }}</td>
+          <td>{{ row.1 }}</td>
+          <td>{{ row.2 }}</td>
+          <td>{{ row.3 }}</td>
+          <td>{{ row.4 }}</td>
+          <td>{{ row.5 }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+document.getElementById("predictionSearch").addEventListener("keyup", function() {
+  const input = this.value.toLowerCase();
+  const rows = document.querySelectorAll("#predictionTable tbody tr");
+  rows.forEach(row => {
+    row.style.display = row.innerText.toLowerCase().includes(input) ? "" : "none";
+  });
+});
+</script>
+
+</body>
+</html>

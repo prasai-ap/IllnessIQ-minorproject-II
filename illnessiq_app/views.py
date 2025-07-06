@@ -3,7 +3,7 @@ from django.db import connection ,IntegrityError
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 import random ,datetime
-from datetime import date
+from datetime import date, timedelta
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
@@ -14,6 +14,8 @@ import pandas as pd
 from xhtml2pdf import pisa
 import markdown 
 import google.generativeai as genai
+import json
+from collections import defaultdict
 
 def index(request):
     return render(request,'index.html')
@@ -117,33 +119,33 @@ def signup(request):
         email = request.POST.get('email')
         
         with connection.cursor() as cursor:
-            # Check if email already exists
+            
             cursor.execute("SELECT COUNT(*) FROM users WHERE u_email = %s", [email])
             if cursor.fetchone()[0] > 0:
                 messages.error(request, "Email already exists.")
                 return render(request, 'signup.html')
 
-            # Insert new user
+            
             cursor.execute("INSERT INTO users (u_name, u_email, u_role) VALUES (%s, %s, %s) RETURNING u_id", 
                            [full_name, email, 'users'])
             user_id = cursor.fetchone()[0]
 
-        # Save session values
+        
         request.session['otp_user_id'] = user_id
         request.session['otp_user_email'] = email
         request.session['otp_user_role'] = 'users'
 
-        # Generate OTP
+        
         otp = str(random.randint(100000, 999999))
         created_at = datetime.datetime.now()
         expires_at = created_at + datetime.timedelta(minutes=5)
 
-        # Save OTP to DB
+        
         with connection.cursor() as cursor:
             cursor.execute("""INSERT INTO otp_verification (u_id, otp_code, created_at, expires_at, is_verified)
                               VALUES (%s, %s, %s, %s, %s)""", [user_id, otp, created_at, expires_at, False])
 
-        # Send combined email
+        
         subject = 'Welcome to IllnessIQ – Your OTP & Introduction'
         message = f'''Dear {full_name},
 
@@ -168,11 +170,8 @@ Thank you for joining!
     return render(request, 'signup.html')
 
 
-from django.shortcuts import render, redirect
-from django.db import connection
-
 def user_dashboard(request):
-    if not request.session.get('user_id'):
+    if request.session.get('user_role') != 'users':
         return redirect('login')
 
     user_id = request.session.get('user_id')
@@ -228,27 +227,106 @@ def user_dashboard(request):
 
 
 def admin_dashboard(request):
-    if request.session.get('user_role')!="admin":
+    if request.session.get('user_role') != 'admin':
         return redirect('login')
-    return render(request,'admin_dash.html')
+
+    with connection.cursor() as cursor:
+    
+        cursor.execute("SELECT COUNT(*) FROM users")
+        user_count = cursor.fetchone()[0]
+
+        cursor.execute("SELECT COUNT(*) FROM feedback")
+        feedback_count = cursor.fetchone()[0]
+
+        cursor.execute("SELECT COUNT(*) FROM issue_report")
+        issue_count = cursor.fetchone()[0]
+
+        cursor.execute("""
+            SELECT COUNT(*) FROM thyroid_risk
+            UNION ALL
+            SELECT COUNT(*) FROM diabetes_risk
+            UNION ALL
+            SELECT COUNT(*) FROM heart_risk
+            UNION ALL
+            SELECT COUNT(*) FROM liver_risk
+        """)
+        prediction_counts = cursor.fetchall()
+        prediction_total = sum([row[0] for row in prediction_counts])
+        disease_labels = ["Thyroid", "Diabetes", "Heart", "Liver"]
+        disease_counts = [row[0] for row in prediction_counts]
+
+
+        cursor.execute("""
+            SELECT 'Thyroid' AS disease, entry_date::date, COUNT(*) 
+            FROM thyroid_medical_details
+            WHERE entry_date >= CURRENT_DATE - INTERVAL '6 days'
+            GROUP BY entry_date::date
+
+            UNION ALL
+
+            SELECT 'Diabetes', entry_date::date, COUNT(*)
+            FROM diabetes_medical_details
+            WHERE entry_date >= CURRENT_DATE - INTERVAL '6 days'
+            GROUP BY entry_date::date
+
+            UNION ALL
+
+            SELECT 'Heart', entry_date::date, COUNT(*)
+            FROM heart_medical_details
+            WHERE entry_date >= CURRENT_DATE - INTERVAL '6 days'
+            GROUP BY entry_date::date
+
+            UNION ALL
+
+            SELECT 'Liver', entry_date::date, COUNT(*)
+            FROM liver_medical_details
+            WHERE entry_date >= CURRENT_DATE - INTERVAL '6 days'
+            GROUP BY entry_date::date
+        """)
+        trend_data = cursor.fetchall()
+
+
+    date_list = [(date.today() - timedelta(days=i)) for i in range(6, -1, -1)]
+    date_labels = [str(d) for d in date_list]
+
+    
+    disease_trends = defaultdict(lambda: defaultdict(int))
+    for disease, entry_date, count in trend_data:
+        disease_trends[disease][str(entry_date)] = count
+
+    final_trend_data = {
+        disease: [disease_trends[disease].get(day, 0) for day in date_labels]
+        for disease in disease_labels
+    }
+
+    return render(request, 'admindash.html', {
+        'user_count': user_count,
+        'feedback_count': feedback_count,
+        'issue_count': issue_count,
+        'prediction_count': prediction_total,
+        'disease_labels': json.dumps(disease_labels),
+        'disease_counts': json.dumps(disease_counts),
+        'date_labels': json.dumps(date_labels),
+        'disease_trend_data': json.dumps(final_trend_data),
+    })
 
 def diabetes_risk(request):
-    if not request.session.get('user_id'):
+    if request.session.get('user_role') != 'users':
         return redirect('login')
     return render(request,'diabetes_risk.html')
 
 def heart_risk(request):
-    if not request.session.get('user_id'):
+    if request.session.get('user_role') != 'users':
         return redirect('login')
     return render(request,'heart_risk.html')
 
 def liver_risk(request):
-    if not request.session.get('user_id'):
+    if request.session.get('user_role') != 'users':
         return redirect('login')
     return render(request,'liver_risk.html')
 
 def thyroid_risk(request):
-    if not request.session.get('user_id'):
+    if request.session.get('user_role') != 'users':
         return redirect('login')
     return render(request,'thyroid_risk.html')
 
@@ -257,7 +335,7 @@ def logout(request):
     return redirect('index')
 
 def feedback(request):
-    if not request.session.get('user_id'):
+    if request.session.get('user_role') != 'users':
         return redirect('login')
     
     if request.method == 'POST':
@@ -282,7 +360,7 @@ def feedback(request):
 
     return render(request, 'feedback.html')
 def report_issue(request):
-    if not request.session.get('user_id'):
+    if request.session.get('user_role') != 'users':
         return redirect('login')
     
     if request.method == 'POST':
@@ -305,17 +383,8 @@ hypertension_map = {'Yes': 1, 'No': 0}
 heart_disease_map = {'Yes': 1, 'No': 0}
 smoking_map = {'Never': 0, 'Former': 1, 'Current': 2}
 
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.db import connection
-from datetime import date
-import pandas as pd
-import joblib
-import markdown
-import google.generativeai as genai
-
 def predict_diabetes(request):
-    if not request.session.get('user_id'):
+    if request.session.get('user_role') != 'users':
         return redirect('login')
 
     try:
@@ -417,7 +486,7 @@ def predict_diabetes(request):
             })
 
 def predict_heart(request):
-    if not request.session.get('user_id'):
+    if request.session.get('user_role') != 'users':
         return redirect('login')
 
     try:
@@ -502,7 +571,7 @@ def predict_heart(request):
 
 
 def predict_liver(request):
-    if not request.session.get('user_id'):
+    if request.session.get('user_role') != 'users':
         return redirect('login')
 
     try:
@@ -599,7 +668,7 @@ def predict_liver(request):
 
 
 def predict_thyroid(request):
-    if not request.session.get('user_id'):
+    if request.session.get('user_role') != 'users':
         return redirect('login')
 
     try:
@@ -682,7 +751,7 @@ def predict_thyroid(request):
 
 
 def download_diabetes_report(request, dr_id):
-    if not request.session.get('user_id'):
+    if request.session.get('user_role') != 'users':
         return redirect('login')
 
     with connection.cursor() as cursor:
@@ -733,7 +802,7 @@ def download_diabetes_report(request, dr_id):
 
 
 def download_heart_report(request, hr_id):
-    if not request.session.get('user_id'):
+    if request.session.get('user_role') != 'users':
         return redirect('login')
 
     with connection.cursor() as cursor:
@@ -779,7 +848,7 @@ def download_heart_report(request, hr_id):
     return response
 
 def download_liver_report(request, lr_id):
-    if not request.session.get('user_id'):
+    if request.session.get('user_role') != 'users':
         return redirect('login')
 
     with connection.cursor() as cursor:
@@ -831,7 +900,7 @@ def download_liver_report(request, lr_id):
     return response
 
 def download_thyroid_report(request, tr_id):
-    if not request.session.get('user_id'):
+    if request.session.get('user_role') != 'users':
         return redirect('login')
 
     with connection.cursor() as cursor:
@@ -878,7 +947,7 @@ def download_thyroid_report(request, tr_id):
 
 
 def history_view(request):
-    if not request.session.get('user_id'):
+    if request.session.get('user_role') != 'users':
         return redirect('login')
 
     user_id = request.session['user_id']
@@ -947,7 +1016,7 @@ def parse_markdown_sections(text):
     return [markdown.markdown(section) for section in sections]
 
 def view_history_detail(request, disease, record_id):
-    if not request.session.get('user_id'):
+    if request.session.get('user_role') != 'users':
         return redirect('login')
 
     user_id = request.session['user_id']
@@ -1107,3 +1176,69 @@ def view_history_detail(request, disease, record_id):
         'record_id': record_id,
         'report_url_name': report_download_url_name
     })
+
+def view_users(request):
+    if request.session.get('user_role') != 'admin':
+        return redirect('login')
+    
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT u_id, u_name, u_email, u_role FROM users ORDER BY u_id DESC")
+        users = cursor.fetchall()
+    return render(request, 'admin_users.html', {'users': users})
+
+
+def view_feedback(request):
+    if request.session.get('user_role') != 'admin':
+        return redirect('login')
+    
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT f.f_id, u.u_name, f.f_description, f.rating
+            FROM feedback f
+            JOIN users u ON f.u_id = u.u_id
+            ORDER BY f.f_id DESC
+        """)
+        feedbacks = cursor.fetchall()
+    return render(request, 'admin_feedback.html', {'feedbacks': feedbacks})
+
+
+def view_issues(request):
+    if request.session.get('user_role') != 'admin':
+        return redirect('login')
+    
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT ir.ir_id, u.u_name, ir.ir_name, ir.ir_description
+            FROM issue_report ir
+            JOIN users u ON ir.u_id = u.u_id
+            ORDER BY ir.ir_id DESC
+        """)
+        issues = cursor.fetchall()
+    return render(request, 'admin_issues.html', {'issues': issues})
+
+def view_predictions(request):
+    if request.session.get('user_role') != 'admin':
+        return redirect('login')
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT 'Thyroid', t.patient_name, t.age, t.gender, r.risk_status, t.entry_date
+            FROM thyroid_medical_details t
+            JOIN thyroid_risk r ON t.t_id = r.t_id
+            UNION ALL
+            SELECT 'Diabetes', d.patient_name, d.age, d.gender, r.risk_status, d.entry_date
+            FROM diabetes_medical_details d
+            JOIN diabetes_risk r ON d.d_id = r.d_id
+            UNION ALL
+            SELECT 'Heart', h.patient_name, h.age, h.gender, r.risk_status, h.entry_date
+            FROM heart_medical_details h
+            JOIN heart_risk r ON h.h_id = r.h_id
+            UNION ALL
+            SELECT 'Liver', l.patient_name, l.age, l.gender, r.risk_status, l.entry_date
+            FROM liver_medical_details l
+            JOIN liver_risk r ON l.l_id = r.l_id
+            ORDER BY entry_date DESC
+        """)
+        predictions = cursor.fetchall()
+
+    return render(request, 'admin_predictions.html', {'predictions': predictions})
