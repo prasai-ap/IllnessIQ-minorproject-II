@@ -39,6 +39,9 @@
       <p class="risk-level {% if result == 'High Risk' %}high-risk{% else %}low-risk{% endif %}">
         {{ result }}
       </p>
+      <p class="genetic-caution-note">
+        <strong>Note:</strong> This risk prediction is based on reported symptoms and test values. If you have a family history of heart or genetic predispositions, please consult a healthcare professional for further assessment.
+      </p>
     </div>
 
     {% if recommendations %}

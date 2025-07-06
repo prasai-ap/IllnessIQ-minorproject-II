@@ -162,6 +162,15 @@ body {
   color: #006600;
 }
 
+.genetic-note {
+  margin-top: 10px;
+  padding: 12px;
+  background-color: #fff3cd;
+  border-left: 5px solid #ffc107;
+  border-radius: 5px;
+  font-size: 0.95rem;
+  color: #856404;
+}
 
 .recommendation-section h3 {
   font-size: 22px;
