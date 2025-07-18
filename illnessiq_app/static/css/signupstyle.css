@@ -9,7 +9,6 @@ body {
   align-items: center;
 }
 
-/* Center container */
 .signup-container {
   display: flex;
   justify-content: center;

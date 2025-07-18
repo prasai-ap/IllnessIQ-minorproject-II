@@ -17,7 +17,7 @@
     </div>
     <h2>Admin Panel</h2>
     <ul>
-      <li><a href="{% url 'admin_dashboard' %}"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+      <li><span class="active"><i class="fas fa-chart-line"></i> Dashboard</span></li>
       <li><a href="{% url 'view_users' %}"><i class="fas fa-users"></i> Users</a></li>
       <li><a href="{% url 'view_predictions' %}"><i class="fas fa-dna"></i> Predictions</a></li> 
       <li><a href="{% url 'view_feedback' %}"><i class="fas fa-comments"></i> Feedback</a></li>
@@ -50,25 +50,28 @@
   </div>
 
   <div class="charts">
-    <div class="chart-container">
+    <div class="chart-container full-width">
       <h3>Disease Prediction Distribution</h3>
       <canvas id="pieChart"></canvas>
     </div>
 
-    <div class="chart-container">
-      <h3>Prediction Trend (Last 7 Days)</h3>
-      <canvas id="lineChart"></canvas>
-    </div>
+    {% for disease in disease_labels %}
+      {% with disease|slugify as disease_id %}
+        <div class="chart-container full-width">
+          <h3>{{ disease }} Prediction Trend (Last 7 Days)</h3>
+          <canvas id="lineChart_{{ disease_id }}"></canvas>
+        </div>
+      {% endwith %}
+    {% endfor %}
   </div>
 </div>
 
 <script>
   const pieLabels = {{ disease_labels|safe }};
   const pieData = {{ disease_counts|safe }};
-  const lineLabels = {{ date_labels|safe }};
-  const lineData = {{ disease_trend_data|safe }};
+  const dateLabels = {{ date_labels|safe }};
+  const diseaseTrendData = {{ disease_trend_data|safe }};
 </script>
-
 <script src="{% static 'js/admin_charts.js' %}"></script>
 </body>
 </html>

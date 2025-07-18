@@ -231,7 +231,6 @@ def admin_dashboard(request):
         return redirect('login')
 
     with connection.cursor() as cursor:
-    
         cursor.execute("SELECT COUNT(*) FROM users")
         user_count = cursor.fetchone()[0]
 
@@ -254,7 +253,6 @@ def admin_dashboard(request):
         prediction_total = sum([row[0] for row in prediction_counts])
         disease_labels = ["Thyroid", "Diabetes", "Heart", "Liver"]
         disease_counts = [row[0] for row in prediction_counts]
-
 
         cursor.execute("""
             SELECT 'Thyroid' AS disease, entry_date::date, COUNT(*) 
@@ -285,11 +283,9 @@ def admin_dashboard(request):
         """)
         trend_data = cursor.fetchall()
 
-
     date_list = [(date.today() - timedelta(days=i)) for i in range(6, -1, -1)]
     date_labels = [str(d) for d in date_list]
 
-    
     disease_trends = defaultdict(lambda: defaultdict(int))
     for disease, entry_date, count in trend_data:
         disease_trends[disease][str(entry_date)] = count
@@ -304,7 +300,7 @@ def admin_dashboard(request):
         'feedback_count': feedback_count,
         'issue_count': issue_count,
         'prediction_count': prediction_total,
-        'disease_labels': json.dumps(disease_labels),
+        'disease_labels': disease_labels,
         'disease_counts': json.dumps(disease_counts),
         'date_labels': json.dumps(date_labels),
         'disease_trend_data': json.dumps(final_trend_data),
