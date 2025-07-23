@@ -385,20 +385,14 @@ def predict_diabetes(request):
 
     try:
         model = joblib.load(diabetes_model)
-    except FileNotFoundError:
-        return render(request, 'diabetes_risk_result.html', {
-            'result': "Error: Prediction model file not found.",
-            'recommendations': ["<p>Please contact support regarding a system configuration error.</p>"]
-        })
     except Exception as e:
-        return render(request, 'diabetes_risk_result.html', {
-            'result': f"Error loading prediction model: {str(e)}",
-            'recommendations': ["<p>Please contact support regarding a system configuration error.</p>"]
-        })
+        messages.error(request, "Model error. Contact support.")
+        return redirect('diabetes_risk')
 
     user = request.session.get('user_id')
 
     if request.method == 'POST':
+        # Extract and validate input
         patient_name = request.POST.get('Patient_Name')
         age_raw = request.POST.get('Age')
         gender = request.POST.get('Gender')
@@ -409,48 +403,46 @@ def predict_diabetes(request):
         hba1c_raw = request.POST.get('HbA1c_Level')
         glucose_raw = request.POST.get('Blood_Glucose_Level')
 
-        
         if not all([patient_name, age_raw, gender, hypertension, heart_disease, smoking_status, bmi_raw, hba1c_raw, glucose_raw]):
-            messages.error(request, "All fields are required. Please fill them out.")
-            return redirect('diabetes_risk') 
+            messages.error(request, "All fields are required.")
+            return redirect('diabetes_risk')
 
-    
         try:
             age = int(age_raw)
             bmi = float(bmi_raw)
             hba1c = float(hba1c_raw)
             glucose = float(glucose_raw)
         except ValueError:
-            messages.error(request, "Please enter valid numeric values for age, BMI, HbA1c, and glucose.")
-            return redirect(request, 'diabetes_risk')
+            messages.error(request, "Invalid numeric inputs.")
+            return redirect('diabetes_risk')
 
-        try:
-            input_data = pd.DataFrame([{
-                'gender': gender_map.get(gender),
-                'age': age,
-                'hypertension': hypertension_map.get(hypertension),
-                'heart_disease': heart_disease_map.get(heart_disease),
-                'smoking_history': smoking_map.get(smoking_status),
-                'bmi': bmi,
-                'HbA1c_level': hba1c,
-                'blood_glucose_level': glucose
-            }])
 
-            prediction = model.predict(input_data)[0]
-            result = "High Risk" if prediction == 1 else "Low Risk"
-            today = date.today()
+        input_data = pd.DataFrame([{
+            'gender': gender_map.get(gender),
+            'age': age,
+            'hypertension': hypertension_map.get(hypertension),
+            'heart_disease': heart_disease_map.get(heart_disease),
+            'smoking_history': smoking_map.get(smoking_status),
+            'bmi': bmi,
+            'HbA1c_level': hba1c,
+            'blood_glucose_level': glucose
+        }])
 
-            with connection.cursor() as cursor:
-                cursor.execute("""INSERT INTO diabetes_medical_details 
-                    (u_id, patient_name, age, gender, hypertension, heart_diseases, smoking_history, bmi, hba1c, blood_glucose, entry_date)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING d_id""",
-                    [user, patient_name, age, gender, hypertension, heart_disease, smoking_status, bmi, hba1c, glucose, today])
-                d_id = cursor.fetchone()[0]
+        prediction = model.predict(input_data)[0]
+        result = "High Risk" if prediction == 1 else "Low Risk"
+        today = date.today()
 
-                cursor.execute("INSERT INTO diabetes_risk (risk_status, d_id) VALUES (%s, %s) RETURNING dr_id", [result, d_id])
-                dr_id = cursor.fetchone()[0]
+        with connection.cursor() as cursor:
+            cursor.execute("""INSERT INTO diabetes_medical_details 
+                (u_id, patient_name, age, gender, hypertension, heart_diseases, smoking_history, bmi, hba1c, blood_glucose, entry_date)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING d_id""",
+                [user, patient_name, age, gender, hypertension, heart_disease, smoking_status, bmi, hba1c, glucose, today])
+            d_id = cursor.fetchone()[0]
 
-            prompt = f"""Based on the following user data, provide personalized health recommendations for diabetes risk management.
+            cursor.execute("INSERT INTO diabetes_risk (risk_status, d_id) VALUES (%s, %s) RETURNING dr_id", [result, d_id])
+            dr_id = cursor.fetchone()[0]
+
+        prompt = f"""Based on the following user data, provide personalized health recommendations for diabetes risk management.
             The user is a {gender.lower()} aged {age} with a {result} of diabetes.
             Key metrics: BMI = {bmi}, HbA1c = {hba1c}, Blood Glucose = {glucose}.
             Health history: Smoking Status = {smoking_status}, Hypertension = {hypertension}, Heart Disease = {heart_disease}.
@@ -460,26 +452,39 @@ def predict_diabetes(request):
             Start directly with the recommendations, no introductory sentences before the first heading.
             """
 
-            model_gemini = genai.GenerativeModel('gemini-2.5-flash')
-            response = model_gemini.generate_content(prompt)
-            recommendation_text = response.text.strip()
-            sections = [s.strip() for s in recommendation_text.split("\n\n") if s.strip()]
-            recommendations = [markdown.markdown(section) for section in sections]
+        try:
+            response = genai.GenerativeModel('gemini-2.5-flash').generate_content(prompt)
+            recommendation_text = response.text.strip() if response.text else None
+            if not recommendation_text:
+                raise ValueError("Empty recommendation")
+            recommendations = [markdown.markdown(s.strip()) for s in recommendation_text.split("\n\n") if s.strip()]
+        except Exception:
+            recommendation_text = "We're currently unable to generate personalized recommendations. Please consult a healthcare provider."
 
-            with connection.cursor() as cursor:
-                cursor.execute("INSERT INTO diabetes_recommendation (dr_id, recommendation) VALUES (%s, %s)", [dr_id, recommendation_text])
+        with connection.cursor() as cursor:
+            cursor.execute("INSERT INTO diabetes_recommendation (dr_id, recommendation) VALUES (%s, %s)", [dr_id, recommendation_text])
 
-            return render(request, 'diabetes_risk_result.html', {
-                'result': result,
-                'recommendations': recommendations,
-                'dr_id': dr_id
-            })
+        return redirect('diabetes_result', dr_id=dr_id)
 
-        except Exception as e:
-            return render(request, 'diabetes_risk_result.html', {
-                'result': f"Unexpected error: {str(e)}",
-                'recommendations': ["<p>An unexpected issue occurred. Please try again later.</p>"]
-            })
+
+def diabetes_result(request, dr_id):
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT risk_status FROM diabetes_risk WHERE dr_id = %s", [dr_id])
+        result_row = cursor.fetchone()
+        result = result_row[0] if result_row else "Unknown"
+
+        cursor.execute("SELECT recommendation FROM diabetes_recommendation WHERE dr_id = %s", [dr_id])
+        rec_row = cursor.fetchone()
+        rec_text = rec_row[0] if rec_row else ""
+
+        recommendations = [markdown.markdown(s.strip()) for s in rec_text.split("\n\n") if s.strip()]
+
+    return render(request, 'diabetes_risk_result.html', {
+        'result': result,
+        'recommendations': recommendations,
+        'dr_id': dr_id
+    })
+
 
 def predict_heart(request):
     if request.session.get('user_role') != 'users':
@@ -488,10 +493,8 @@ def predict_heart(request):
     try:
         model = joblib.load(heart_model)
     except Exception as e:
-        return render(request, 'heart_risk_result.html', {
-            'result': f"Model Error: {str(e)}",
-            'recommendations': ["<p>Please contact support.</p>"]
-        })
+        messages.error(request, f"Model Load Error: {e}")
+        return redirect('heart_risk')
 
     user_id = request.session.get('user_id')
 
@@ -536,34 +539,49 @@ def predict_heart(request):
                 cursor.execute("INSERT INTO heart_risk (risk_status, h_id) VALUES (%s, %s) RETURNING hr_id", [result, h_id])
                 hr_id = cursor.fetchone()[0]
 
-            
             prompt = f"""Based on the following user data, provide personalized health recommendations for heart disease risk management.
             The user is a {gender.lower()} aged {age} with a {result} of heart disease.
             Key metrics: cholesterol = {cholesterol}, high fasting blood sugar = {fbs}, heart rate = {heart_rate}.
+            Structure your response with clear headings like "Summary of Risk", "Lifestyle Recommendations", etc. Use bullet points."""
 
-            Structure your response with clear headings for categories like "Summary of Risk", "Lifestyle Recommendations", "Dietary Advice", and "Medical Considerations".
-            Use bullet points for individual recommendations within each category.
-            Start directly with the recommendations, no introductory sentences before the first heading.
-            """
-
-            response = genai.GenerativeModel('gemini-2.5-flash').generate_content(prompt)
-            recommendation_text = response.text.strip()
-            recommendations = [markdown.markdown(s.strip()) for s in recommendation_text.split("\n\n") if s.strip()]
+            try:
+                response = genai.GenerativeModel('gemini-2.5-flash').generate_content(prompt)
+                recommendation_text = response.text.strip() if response.text else None
+                if not recommendation_text:
+                    raise ValueError("Empty recommendation from Gemini")
+            except Exception:
+                recommendation_text = "We're currently unable to generate personalized recommendations. Please consult a healthcare provider."
 
             with connection.cursor() as cursor:
                 cursor.execute("INSERT INTO heart_recommendation (hr_id, recommendation) VALUES (%s, %s)", [hr_id, recommendation_text])
 
-            return render(request, 'heart_risk_result.html', {
-                'result': result,
-                'recommendations': recommendations,
-                'hr_id': hr_id
-            })
+            return redirect('heart_result', hr_id=hr_id)
 
         except Exception as e:
-            return render(request, 'heart_risk_result.html', {
-                'result': f"Error: {str(e)}",
-                'recommendations': ["<p>Please check your input.</p>"]
-            })
+            messages.error(request, f"Unexpected Error: {e}")
+            return redirect('heart_risk')
+
+def heart_result(request, hr_id):
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT risk_status, recommendation 
+            FROM heart_risk 
+            JOIN heart_recommendation USING(hr_id) 
+            WHERE hr_id = %s
+        """, [hr_id])
+        row = cursor.fetchone()
+
+    if not row:
+        return HttpResponse("Invalid Result ID")
+
+    result, rec_text = row
+    recommendations = [markdown.markdown(s.strip()) for s in rec_text.split("\n\n") if s.strip()]
+
+    return render(request, 'heart_risk_result.html', {
+        'result': result,
+        'recommendations': recommendations,
+        'hr_id': hr_id
+    })
 
 
 def predict_liver(request):
@@ -573,10 +591,8 @@ def predict_liver(request):
     try:
         model = joblib.load(liver_model)
     except Exception as e:
-        return render(request, 'liver_risk_result.html', {
-            'result': f"Model Error: {str(e)}",
-            'recommendations': ["<p>Contact support for assistance.</p>"]
-        })
+        messages.error(request, f"Model Load Error: {e}")
+        return redirect('liver_risk')
 
     user_id = request.session.get('user_id')
 
@@ -638,29 +654,48 @@ def predict_liver(request):
             prompt = f"""Based on the following user data, provide personalized health recommendations for liver health management.
             The user is a {gender.lower()} aged {age} with a {result} of liver disease.
             Key metrics: Total Bilirubin = {tb}, Direct Bilirubin = {db}, SGOT = {sgot}, SGPT = {sgpt}, ALP = {alkp}, Protein = {protein}, Albumin = {albumin}, A/G Ratio = {ag_ratio}.
+            Structure your response with headings and bullet points."""
 
-            Structure your response with clear headings for categories like "Summary of Risk", "Lifestyle Recommendations", "Dietary Advice", and "Medical Considerations".
-            Use bullet points for individual recommendations within each category.
-            Start directly with the recommendations, no introductory sentences before the first heading.
-            """
-            response = genai.GenerativeModel('gemini-2.5-flash').generate_content(prompt)
-            recommendation_text = response.text.strip()
-            recommendations = [markdown.markdown(s.strip()) for s in recommendation_text.split("\n\n") if s.strip()]
+            try:
+                response = genai.GenerativeModel('gemini-2.5-flash').generate_content(prompt)
+                recommendation_text = response.text.strip() if response.text else None
+                if not recommendation_text:
+                    raise ValueError("Empty recommendation from Gemini")
+            except Exception:
+                recommendation_text = "We're currently unable to generate personalized recommendations. Please consult a healthcare provider."
 
             with connection.cursor() as cursor:
                 cursor.execute("INSERT INTO liver_recommendation (lr_id, recommendation) VALUES (%s, %s)", [lr_id, recommendation_text])
 
-            return render(request, 'liver_risk_result.html', {
-                'result': result,
-                'recommendations': recommendations,
-                'lr_id': lr_id
-            })
+            return redirect('liver_result', lr_id=lr_id)
 
         except Exception as e:
-            return render(request, 'liver_risk_result.html', {
-                'result': f"Unexpected error: {str(e)}",
-                'recommendations': ["<p>Please check your entries and try again.</p>"]
-            })
+            messages.error(request, f"Unexpected Error: {e}")
+            return redirect('liver_risk')
+
+
+
+def liver_result(request, lr_id):
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT risk_status, recommendation 
+            FROM liver_risk 
+            JOIN liver_recommendation USING(lr_id) 
+            WHERE lr_id = %s
+        """, [lr_id])
+        row = cursor.fetchone()
+
+    if not row:
+        return HttpResponse("Invalid Result ID")
+
+    result, rec_text = row
+    recommendations = [markdown.markdown(s.strip()) for s in rec_text.split("\n\n") if s.strip()]
+
+    return render(request, 'liver_risk_result.html', {
+        'result': result,
+        'recommendations': recommendations,
+        'lr_id': lr_id
+    })
 
 
 def predict_thyroid(request):
@@ -670,10 +705,8 @@ def predict_thyroid(request):
     try:
         model = joblib.load(thyroid_model)
     except Exception as e:
-        return render(request, 'thyroid_risk_result.html', {
-            'result': f"Model Error: {str(e)}",
-            'recommendations': ["<p>Contact support.</p>"]
-        })
+        messages.error(request, f"Model Load Error: {e}")
+        return redirect('thyroid_risk')
 
     user_id = request.session.get('user_id')
 
@@ -694,7 +727,7 @@ def predict_thyroid(request):
             tsh = float(tsh)
             ft3 = float(ft3)
             ft4 = float(ft4)
-            
+
             input_data = pd.DataFrame([{
                 'age': age,
                 'gender': 1 if gender.lower() == 'male' else 0,
@@ -708,7 +741,8 @@ def predict_thyroid(request):
             today = date.today()
 
             with connection.cursor() as cursor:
-                cursor.execute("""INSERT INTO thyroid_medical_details (u_id, age, gender, tsh, ft4, ft3, patient_name, entry_date)
+                cursor.execute("""INSERT INTO thyroid_medical_details 
+                    (u_id, age, gender, tsh, ft4, ft3, patient_name, entry_date)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING t_id""",
                     [user_id, age, gender, tsh, ft4, ft3, patient_name, today])
                 t_id = cursor.fetchone()[0]
@@ -719,30 +753,49 @@ def predict_thyroid(request):
             prompt = f"""Based on the following user data, provide personalized health recommendations for thyroid disease risk management.
             The user is a {gender.lower()} aged {age} with a {result} of thyroid disease.
             Key metrics: TSH = {tsh}, FT4 = {ft4}, FT3 = {ft3}.
-
             Structure your response with clear headings for categories like "Summary of Risk", "Lifestyle Recommendations", "Dietary Advice", and "Medical Considerations".
-            Use bullet points for individual recommendations within each category.
-            Start directly with the recommendations, no introductory sentences before the first heading.
-            
+            Use bullet points for each recommendation.
             """
-            response = genai.GenerativeModel('gemini-2.5-flash').generate_content(prompt)
-            recommendation_text = response.text.strip()
-            recommendations = [markdown.markdown(s.strip()) for s in recommendation_text.split("\n\n") if s.strip()]
+
+            try:
+                response = genai.GenerativeModel('gemini-2.5-flash').generate_content(prompt)
+                recommendation_text = response.text.strip() if response.text else None
+                if not recommendation_text:
+                    raise ValueError("Empty recommendation from Gemini")
+            except Exception:
+                recommendation_text = "We're currently unable to generate personalized recommendations. Please consult a healthcare provider."
 
             with connection.cursor() as cursor:
                 cursor.execute("INSERT INTO thyroid_recommendation (tr_id, recommendation) VALUES (%s, %s)", [tr_id, recommendation_text])
 
-            return render(request, 'thyroid_risk_result.html', {
-                'result': result,
-                'recommendations': recommendations,
-                'tr_id': tr_id
-            })
+            return redirect('thyroid_result', tr_id=tr_id)
 
         except Exception as e:
-            return render(request, 'thyroid_risk_result.html', {
-                'result': f"Unexpected error: {str(e)}",
-                'recommendations': ["<p>Please try again later.</p>"]
-            })
+            messages.error(request, f"Unexpected Error: {e}")
+            return redirect('thyroid_risk')
+
+
+def thyroid_result(request, tr_id):
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT risk_status, recommendation 
+            FROM thyroid_risk 
+            JOIN thyroid_recommendation USING(tr_id) 
+            WHERE tr_id = %s
+        """, [tr_id])
+        row = cursor.fetchone()
+
+    if not row:
+        return HttpResponse("Invalid Result ID")
+
+    result, rec_text = row
+    recommendations = [markdown.markdown(s.strip()) for s in rec_text.split("\n\n") if s.strip()]
+
+    return render(request, 'thyroid_risk_result.html', {
+        'result': result,
+        'recommendations': recommendations,
+        'tr_id': tr_id
+    })
 
 
 
