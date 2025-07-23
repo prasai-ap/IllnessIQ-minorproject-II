@@ -51,7 +51,7 @@
           <td>{{ i.0 }}</td>
           <td>{{ i.1 }}</td>
           <td>{{ i.2 }}</td>
-          <td>{{ i.3 }}</td>
+          <td title="{{ i.3 }}" class="truncate">{{ i.3|truncatechars:60 }}</td>
         </tr>
         {% endfor %}
       </tbody>
