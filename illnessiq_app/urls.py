@@ -33,4 +33,6 @@ urlpatterns = [
     path('admin-feedback/', views.view_feedback, name='view_feedback'),
     path('admin-issues/', views.view_issues, name='view_issues'),
     path('admin-predictions/', views.view_predictions, name='view_predictions'),
+    path('admin/fetch-record-id/', views.fetch_admin_record_id, name='fetch_admin_record_id'),
+    path('admin/history-detail/<str:disease>/<int:record_id>/', views.view_history_detail, name='admin_history_detail'),
 ]

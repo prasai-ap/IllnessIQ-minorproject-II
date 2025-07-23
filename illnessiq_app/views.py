@@ -16,6 +16,7 @@ import markdown
 import google.generativeai as genai
 import json
 from collections import defaultdict
+from django.views.decorators.http import require_GET
 
 def index(request):
     return render(request,'index.html')
@@ -1075,10 +1076,11 @@ def parse_markdown_sections(text):
     return [markdown.markdown(section) for section in sections]
 
 def view_history_detail(request, disease, record_id):
-    if request.session.get('user_role') != 'users':
+    if request.session.get('user_role') not in ['users', 'admin']:
         return redirect('login')
 
-    user_id = request.session['user_id']
+    user_role = request.session.get('user_role')
+    user_id = request.session.get('user_id')
     data = None
     recommendations = []
 
@@ -1086,13 +1088,22 @@ def view_history_detail(request, disease, record_id):
         if disease == 'thyroid':
             report_download_url_name = f"download_{disease}_report"
 
-            cursor.execute("""
-                SELECT t.patient_name, t.age, t.gender, t.tsh, t.ft4, t.ft3,
-                       tr.risk_status, t.entry_date
-                FROM thyroid_medical_details t
-                JOIN thyroid_risk tr ON t.t_id = tr.t_id
-                WHERE t.u_id = %s AND t.t_id = %s
-            """, [user_id, record_id])
+            if user_role == 'admin':
+                cursor.execute("""
+                    SELECT t.patient_name, t.age, t.gender, t.tsh, t.ft4, t.ft3,
+                           tr.risk_status, t.entry_date
+                    FROM thyroid_medical_details t
+                    JOIN thyroid_risk tr ON t.t_id = tr.t_id
+                    WHERE t.t_id = %s
+                """, [record_id])
+            else:
+                cursor.execute("""
+                    SELECT t.patient_name, t.age, t.gender, t.tsh, t.ft4, t.ft3,
+                           tr.risk_status, t.entry_date
+                    FROM thyroid_medical_details t
+                    JOIN thyroid_risk tr ON t.t_id = tr.t_id
+                    WHERE t.u_id = %s AND t.t_id = %s
+                """, [user_id, record_id])
             row = cursor.fetchone()
 
             cursor.execute("""
@@ -1120,14 +1131,24 @@ def view_history_detail(request, disease, record_id):
         elif disease == 'liver':
             report_download_url_name = f"download_{disease}_report"
 
-            cursor.execute("""
-                SELECT l.patient_name, l.age, l.gender, l.bilirubin_total, l.bilirubin_direct,
-                       l.sgot, l.sgpt, l.alkaline_phosphatase, l.protein, l.albumin,
-                       l.ag_ratio, lr.risk_status, l.entry_date
-                FROM liver_medical_details l
-                JOIN liver_risk lr ON l.l_id = lr.l_id
-                WHERE l.u_id = %s AND l.l_id = %s
-            """, [user_id, record_id])
+            if user_role == 'admin':
+                cursor.execute("""
+                    SELECT l.patient_name, l.age, l.gender, l.bilirubin_total, l.bilirubin_direct,
+                           l.sgot, l.sgpt, l.alkaline_phosphatase, l.protein, l.albumin,
+                           l.ag_ratio, lr.risk_status, l.entry_date
+                    FROM liver_medical_details l
+                    JOIN liver_risk lr ON l.l_id = lr.l_id
+                    WHERE l.l_id = %s
+                """, [record_id])
+            else:
+                cursor.execute("""
+                    SELECT l.patient_name, l.age, l.gender, l.bilirubin_total, l.bilirubin_direct,
+                           l.sgot, l.sgpt, l.alkaline_phosphatase, l.protein, l.albumin,
+                           l.ag_ratio, lr.risk_status, l.entry_date
+                    FROM liver_medical_details l
+                    JOIN liver_risk lr ON l.l_id = lr.l_id
+                    WHERE l.u_id = %s AND l.l_id = %s
+                """, [user_id, record_id])
             row = cursor.fetchone()
 
             cursor.execute("""
@@ -1160,13 +1181,22 @@ def view_history_detail(request, disease, record_id):
         elif disease == 'heart':
             report_download_url_name = f"download_{disease}_report"
 
-            cursor.execute("""
-                SELECT h.patient_name, h.age, h.gender, h.heart_rate, h.cholesterol,
-                       h.high_blood_sugar, hr.risk_status, h.entry_date
-                FROM heart_medical_details h
-                JOIN heart_risk hr ON h.h_id = hr.h_id
-                WHERE h.u_id = %s AND h.h_id = %s
-            """, [user_id, record_id])
+            if user_role == 'admin':
+                cursor.execute("""
+                    SELECT h.patient_name, h.age, h.gender, h.heart_rate, h.cholesterol,
+                           h.high_blood_sugar, hr.risk_status, h.entry_date
+                    FROM heart_medical_details h
+                    JOIN heart_risk hr ON h.h_id = hr.h_id
+                    WHERE h.h_id = %s
+                """, [record_id])
+            else:
+                cursor.execute("""
+                    SELECT h.patient_name, h.age, h.gender, h.heart_rate, h.cholesterol,
+                           h.high_blood_sugar, hr.risk_status, h.entry_date
+                    FROM heart_medical_details h
+                    JOIN heart_risk hr ON h.h_id = hr.h_id
+                    WHERE h.u_id = %s AND h.h_id = %s
+                """, [user_id, record_id])
             row = cursor.fetchone()
 
             cursor.execute("""
@@ -1193,15 +1223,25 @@ def view_history_detail(request, disease, record_id):
 
         elif disease == 'diabetes':
             report_download_url_name = f"download_{disease}_report"
-            
-            cursor.execute("""
-                SELECT d.patient_name, d.age, d.gender, d.hypertension, d.heart_diseases,
-                       d.smoking_history, d.bmi, d.hba1c, d.blood_glucose,
-                       dr.risk_status, d.entry_date
-                FROM diabetes_medical_details d
-                JOIN diabetes_risk dr ON d.d_id = dr.d_id
-                WHERE d.u_id = %s AND d.d_id = %s
-            """, [user_id, record_id])
+
+            if user_role == 'admin':
+                cursor.execute("""
+                    SELECT d.patient_name, d.age, d.gender, d.hypertension, d.heart_diseases,
+                           d.smoking_history, d.bmi, d.hba1c, d.blood_glucose,
+                           dr.risk_status, d.entry_date
+                    FROM diabetes_medical_details d
+                    JOIN diabetes_risk dr ON d.d_id = dr.d_id
+                    WHERE d.d_id = %s
+                """, [record_id])
+            else:
+                cursor.execute("""
+                    SELECT d.patient_name, d.age, d.gender, d.hypertension, d.heart_diseases,
+                           d.smoking_history, d.bmi, d.hba1c, d.blood_glucose,
+                           dr.risk_status, d.entry_date
+                    FROM diabetes_medical_details d
+                    JOIN diabetes_risk dr ON d.d_id = dr.d_id
+                    WHERE d.u_id = %s AND d.d_id = %s
+                """, [user_id, record_id])
             row = cursor.fetchone()
 
             cursor.execute("""
@@ -1233,8 +1273,10 @@ def view_history_detail(request, disease, record_id):
         'data': data,
         'recommendations': recommendations,
         'record_id': record_id,
-        'report_url_name': report_download_url_name
+        'report_url_name': report_download_url_name,
+        'user_role': request.session.get('user_role')
     })
+
 
 def view_users(request):
     if request.session.get('user_role') != 'admin':
@@ -1301,3 +1343,33 @@ def view_predictions(request):
         predictions = cursor.fetchall()
 
     return render(request, 'admin_predictions.html', {'predictions': predictions})
+
+    from django.views.decorators.http import require_GET
+
+@require_GET
+def fetch_admin_record_id(request):
+    if request.session.get('user_role') != 'admin':
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+
+    disease = request.GET.get('disease')
+    name = request.GET.get('name')
+    age = request.GET.get('age')
+    gender = request.GET.get('gender')
+    entry_date = request.GET.get('entry_date')
+
+    query_map = {
+        'diabetes': ("SELECT d_id FROM diabetes_medical_details WHERE patient_name=%s AND age=%s AND gender=%s AND entry_date=%s",),
+        'heart': ("SELECT h_id FROM heart_medical_details WHERE patient_name=%s AND age=%s AND gender=%s AND entry_date=%s",),
+        'liver': ("SELECT l_id FROM liver_medical_details WHERE patient_name=%s AND age=%s AND gender=%s AND entry_date=%s",),
+        'thyroid': ("SELECT t_id FROM thyroid_medical_details WHERE patient_name=%s AND age=%s AND gender=%s AND entry_date=%s",),
+    }
+
+    if disease not in query_map:
+        return JsonResponse({'error': 'Invalid disease'}, status=400)
+
+    with connection.cursor() as cursor:
+        cursor.execute(query_map[disease][0], [name, age, gender, entry_date])
+        row = cursor.fetchone()
+
+    return JsonResponse({'record_id': row[0] if row else None})
+

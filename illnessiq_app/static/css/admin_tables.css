@@ -134,3 +134,8 @@ th {
   text-overflow: ellipsis;
   cursor: pointer;
 }
+
+tr.clickable-row:hover {
+  cursor: pointer;
+  background-color: #f5f5f5;
+}

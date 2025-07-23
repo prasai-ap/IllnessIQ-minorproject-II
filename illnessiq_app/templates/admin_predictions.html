@@ -47,14 +47,14 @@
       </thead>
       <tbody>
         {% for row in predictions %}
-        <tr>
+        <tr class="clickable-row" data-disease="{{ row.0|lower }}" data-name="{{ row.1 }}" data-age="{{ row.2 }}" data-gender="{{ row.3 }}" data-date="{{ row.5 }}">
           <td>{{ row.0 }}</td>
           <td>{{ row.1 }}</td>
           <td>{{ row.2 }}</td>
           <td>{{ row.3 }}</td>
           <td>{{ row.4 }}</td>
           <td>{{ row.5 }}</td>
-        </tr>
+        </tr>        
         {% endfor %}
       </tbody>
     </table>
@@ -69,7 +69,26 @@ document.getElementById("predictionSearch").addEventListener("keyup", function()
     row.style.display = row.innerText.toLowerCase().includes(input) ? "" : "none";
   });
 });
-</script>
 
+document.querySelectorAll('.clickable-row').forEach(row => {
+  row.addEventListener('click', () => {
+    const disease = row.dataset.disease;
+    const name = row.dataset.name;
+    const age = row.dataset.age;
+    const gender = row.dataset.gender;
+    const entryDate = row.dataset.date;
+
+    fetch(`/admin/fetch-record-id/?disease=${disease}&name=${name}&age=${age}&gender=${gender}&entry_date=${entryDate}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.record_id) {
+          window.location.href = `/admin/history-detail/${disease}/${data.record_id}/`;
+        } else {
+          alert('Record not found.');
+        }
+      });
+  });
+});
+</script>
 </body>
 </html>
