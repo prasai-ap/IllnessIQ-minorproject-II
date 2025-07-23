@@ -11,7 +11,7 @@ body {
   justify-content: flex-end;
   align-items: center;
   background-color: #ffffff;
-  height: 70px;
+  height: 70px; 
   padding: 0 2rem;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   position: sticky;
@@ -25,15 +25,16 @@ body {
   left: 2rem;
   top: 50%;
   transform: translateY(-50%);
-  height: 60px;
+  height: 150px;
   z-index: 1;
 }
 
 .logo img {
-  height: 60px;
+  height: 150px;
   width: auto;
   object-fit: contain;
 }
+
 
 .dropdown {
   position: relative;

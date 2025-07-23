@@ -11,17 +11,17 @@
 
     <nav class="navbar">
         <div class="logo">
-            <a href="{% url 'user_dashboard' %}">
-                <img src="{% static 'images/logo.png' %}" alt="IllnessIQ Logo">
-            </a>
+          <a href="{% url 'index'%}">
+          <img src="{% static 'images/logo.png' %}" alt="IllnessIQ Logo">
+          </a>
         </div>
         <div class="dropdown">
             <button class="dropdown-toggle" id="dropdownBtn">👤</button>
             <ul class="dropdown-menu" id="dropdownMenu">
-                <li><a href="{% url 'history' %}">History</a></li>
-                <li><a href="{% url 'feedback' %}">Feedback</a></li>
-                <li><a href="{% url 'report_issue' %}">Report Issue</a></li>
-                <li><a href="{% url 'logout' %}">Logout</a></li>
+              <li><a href="{% url 'history' %}">History</a></li>
+              <li><a href="{% url 'feedback' %}">Feedback</a></li>
+              <li><a href="{% url 'report_issue' %}">Report Issue</a></li>
+              <li><a href="{% url 'logout' %}">Logout</a></li>
             </ul>
         </div>
     </nav>
