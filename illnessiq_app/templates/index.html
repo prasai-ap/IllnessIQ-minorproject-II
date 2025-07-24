@@ -18,7 +18,11 @@
       </a>
       <div class="nav-links">
         <a href="{% url 'aboutus' %}">About Us</a>
-        <a href="{% url 'login' %}">Login</a>
+        {% if request.session.user_role %}
+            <a href="{% url 'logout' %}">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}">Login</a>
+        {% endif %}
       </div>
     </div>
   </nav>

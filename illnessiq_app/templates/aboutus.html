@@ -18,7 +18,12 @@
         <img src="{% static 'images/logo.png' %}" alt="IllnessIQ Logo" />
       </a>
       <nav class="nav-links">
-        <a href="{% url 'login' %}">Login</a>
+        <a href="{% url 'aboutus' %}">About Us</a>
+        {% if request.session.user_role %}
+            <a href="{% url 'logout' %}">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}">Login</a>
+        {% endif %}
       </nav>
     </div>
   </header>
