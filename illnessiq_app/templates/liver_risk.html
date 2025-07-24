@@ -120,21 +120,31 @@
   <script>
     const dropdownBtn = document.getElementById('dropdownBtn');
     const dropdownMenu = document.getElementById('dropdownMenu');
-
+    const liverForm = document.getElementById('liverForm');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+  
     dropdownBtn.addEventListener('click', () => {
       dropdownMenu.classList.toggle('show');
     });
-
+  
     window.addEventListener('click', (e) => {
       if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
         dropdownMenu.classList.remove('show');
       }
     });
+  
 
     liverForm.addEventListener('submit', function () {
       loadingOverlay.style.display = 'flex';
     });
+  
+    window.addEventListener('pageshow', function () {
+      if (loadingOverlay) {
+        loadingOverlay.style.display = 'none';
+      }
+    });
   </script>
+  
 
 </body>
 </html>
