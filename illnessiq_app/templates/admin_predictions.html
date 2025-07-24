@@ -37,14 +37,14 @@
     <table id="predictionTable">
       <thead>
         <tr>
-          <th>Disease</th>
-          <th>Patient Name</th>
-          <th>Age</th>
-          <th>Gender</th>
-          <th>Risk Status</th>
-          <th>Date</th>
+          <th onclick="sortTable(0)">Disease ⬍</th>
+          <th onclick="sortTable(1)">Patient Name ⬍</th>
+          <th onclick="sortTable(2)">Age ⬍</th>
+          <th onclick="sortTable(3)">Gender ⬍</th>
+          <th onclick="sortTable(4)">Risk Status ⬍</th>
+          <th onclick="sortTable(5)">Date ⬍</th>
         </tr>
-      </thead>
+      </thead>      
       <tbody>
         {% for row in predictions %}
         <tr class="clickable-row" data-disease="{{ row.0|lower }}" data-name="{{ row.1 }}" data-age="{{ row.2 }}" data-gender="{{ row.3 }}" data-date="{{ row.5 }}">
@@ -89,6 +89,48 @@ document.querySelectorAll('.clickable-row').forEach(row => {
       });
   });
 });
+
+let currentSortColumn = -1;
+let sortAscending = true;
+
+function sortTable(columnIndex) {
+  const table = document.getElementById("predictionTable");
+  const tbody = table.tBodies[0];
+  const rows = Array.from(tbody.rows);
+
+  if (currentSortColumn === columnIndex) {
+    sortAscending = !sortAscending;
+  } else {
+    sortAscending = true;
+    currentSortColumn = columnIndex;
+  }
+
+  rows.sort((a, b) => {
+    const aText = a.cells[columnIndex].innerText.trim();
+    const bText = b.cells[columnIndex].innerText.trim();
+
+    let comparison = 0;
+
+    
+    if (columnIndex === 5) {
+      const aDate = Date.parse(aText);
+      const bDate = Date.parse(bText);
+      comparison = aDate - bDate;
+    }
+    
+    else if (!isNaN(aText) && !isNaN(bText)) {
+      comparison = parseFloat(aText) - parseFloat(bText);
+    }
+    
+    else {
+      comparison = aText.localeCompare(bText);
+    }
+
+    return sortAscending ? comparison : -comparison;
+  });
+
+  rows.forEach(row => tbody.appendChild(row));
+}
 </script>
 </body>
 </html>
