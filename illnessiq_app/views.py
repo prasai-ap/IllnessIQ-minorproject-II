@@ -416,6 +416,21 @@ def predict_diabetes(request):
             messages.error(request, "Invalid numeric inputs.")
             return redirect('diabetes_risk')
 
+        if not (0 <= age <= 100):
+            messages.error(request, "Age must be between 0 and 100.")
+            return redirect('diabetes_risk')
+
+        if not (10.0 <= bmi <= 60.0):
+            messages.error(request, "BMI must be between 10.0 and 60.0.")
+            return redirect('diabetes_risk')
+
+        if not (3.0 <= hba1c <= 15.0):
+            messages.error(request, "HbA1c level must be between 3.0% and 15.0%.")
+            return redirect('diabetes_risk')
+
+        if not (50 <= glucose <= 500):
+            messages.error(request, "Blood Glucose level must be between 50 and 500 mg/dL.")
+            return redirect('diabetes_risk')
 
         input_data = pd.DataFrame([{
             'gender': gender_map.get(gender),
@@ -516,6 +531,18 @@ def predict_heart(request):
             heart_rate = int(hr_raw)
             gender_encoded = 1 if gender.lower() == 'male' else 0
             fbs_encoded = 1 if fbs.lower() == 'yes' else 0
+            
+            if not (0 <= age <= 100):
+                messages.error(request, "Age must be between 20 and 100.")
+                return redirect('heart_risk')
+
+            if not (100 <= cholesterol <= 400):
+                messages.error(request, "Cholesterol level must be between 100 and 400 mg/dL.")
+                return redirect('heart_risk')
+
+            if not (40 <= heart_rate <= 200):
+                messages.error(request, "Heart rate must be between 40 and 200 bpm.")
+                return redirect('heart_risk')
 
             input_data = pd.DataFrame([{
                 'age': age, 
@@ -628,6 +655,42 @@ def predict_liver(request):
             albumin = float(albumin)
             ag_ratio = float(ag_ratio)
 
+            if not (0 <= age <= 100):
+                messages.error(request, "Age must be between 18 and 100.")
+                return redirect('liver_risk')
+
+            if not (0.1 <= tb <= 10.0):
+                messages.error(request, "Total Bilirubin must be between 0.1 and 10.0.")
+                return redirect('liver_risk')
+
+            if not (0 <= db <= 5.0):
+                messages.error(request, "Direct Bilirubin must be between 0.0 and 5.0.")
+                return redirect('liver_risk')
+
+            if not (10 <= sgot <= 500):
+                messages.error(request, "SGOT must be between 10 and 500.")
+                return redirect('liver_risk')
+
+            if not (10 <= sgpt <= 500):
+                messages.error(request, "SGPT must be between 10 and 500.")
+                return redirect('liver_risk')
+
+            if not (40 <= alkp <= 600):
+                messages.error(request, "Alkaline Phosphatase must be between 40 and 600.")
+                return redirect('liver_risk')
+
+            if not (4.5 <= protein <= 10.0):
+                messages.error(request, "Total Protein must be between 4.5 and 10.0.")
+                return redirect('liver_risk')
+
+            if not (2.5 <= albumin <= 6.0):
+                messages.error(request, "Albumin must be between 2.5 and 6.0.")
+                return redirect('liver_risk')
+
+            if not (0.3 <= ag_ratio <= 2.5):
+                messages.error(request, "Albumin/Globulin Ratio must be between 0.3 and 2.5.")
+                return redirect('liver_risk')
+
             input_data = pd.DataFrame([{
                 'Age ': age,
                 'Gender': 1 if gender.lower() == 'male' else 0,
@@ -735,6 +798,22 @@ def predict_thyroid(request):
             tsh = float(tsh)
             ft3 = float(ft3)
             ft4 = float(ft4)
+
+            if not (0 <= age <= 100):
+                messages.error(request, "Age must be between 0 and 100.")
+                return redirect('thyroid_risk')
+
+            if not (0.1 <= tsh <= 100.0):
+                messages.error(request, "TSH must be between 0.1 and 100 mIU/L.")
+                return redirect('thyroid_risk')
+
+            if not (0.5 <= ft4 <= 5.0):
+                messages.error(request, "FT4 must be between 0.5 and 5.0 ng/dL.")
+                return redirect('thyroid_risk')
+
+            if not (1 <= ft3 <= 10.0):
+                messages.error(request, "FT3 must be between 1.0 and 10.0 pg/mL.")
+                return redirect('thyroid_risk')
 
             input_data = pd.DataFrame([{
                 'age': age,

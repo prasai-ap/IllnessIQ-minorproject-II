@@ -47,7 +47,7 @@
         </div>
         <div class="form-group">
           <label for="age">Age</label>
-          <input type="number" id="age" name="Age" required>
+          <input type="number" id="age" name="Age" required placeholder="Enter age (0 - 100)" min="0" max="100">
         </div>
         <div class="form-group">
           <label for="gender">Gender</label>
@@ -84,15 +84,15 @@
         </div>
         <div class="form-group">
           <label for="bmi">Body Mass Index (BMI)</label>
-          <input type="number" step="any" id="bmi" name="BMI" required>
+          <input type="number" step="any" id="bmi" name="BMI" required placeholder="e.g., 10.0 - 60.0" min="10.0" max="60.0">
         </div>
         <div class="form-group">
           <label for="hba1c">HbA1c Level (%)</label>
-          <input type="number" step="any" id="hba1c" name="HbA1c_Level" required>
+          <input type="number" step="any" id="hba1c" name="HbA1c_Level" required placeholder="e.g., 3.0 - 15.0" min="3.0" max="15.0">
         </div>
         <div class="form-group">
           <label for="glucose">Blood Glucose Level (mg/dL)</label>
-          <input type="number" step="any" id="glucose" name="Blood_Glucose_Level" required>
+          <input type="number" step="any" id="glucose" name="Blood_Glucose_Level" required placeholder="e.g., 50 - 500" min="50" max="500">
         </div>
 
         <button type="submit">Predict</button>

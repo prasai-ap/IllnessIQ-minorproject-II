@@ -46,7 +46,7 @@
         </div>
         <div class="form-group">
           <label for="age">Age</label>
-          <input type="number" id="age" name="Age" required>
+          <input type="number" id="age" name="Age" required placeholder="e.g., 0 - 100" min="0" max="100">
         </div>
         <div class="form-group">
           <label for="gender">Gender</label>
@@ -58,7 +58,7 @@
         </div>
         <div class="form-group">
           <label for="cholesterol">Cholesterol Level (mg/dL)</label>
-          <input type="number" step="any" id="cholesterol" name="Cholesterol" required>
+          <input type="number" step="any" id="cholesterol" name="Cholesterol" required placeholder="e.g., 100 - 400" min="100" max="400">
         </div>
         <div class="form-group">
           <label for="fasting_blood_sugar">High Fasting Blood Sugar (&gt; 120 mg/dL)?</label>
@@ -70,7 +70,7 @@
         </div>
         <div class="form-group">
           <label for="heart_rate">Heart Rate (bpm)</label>
-          <input type="number" id="heart_rate" name="Heart_Rate" required>
+          <input type="number" id="heart_rate" name="Heart_Rate" required placeholder="e.g., 40 - 200" min="40" max="200">
         </div>
         <button type="submit">Predict</button>
       </div>

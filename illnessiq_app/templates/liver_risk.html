@@ -49,7 +49,7 @@
 
         <div class="form-group">
           <label for="age">Age</label>
-          <input type="number" id="age" name="Age" required>
+          <input type="number" id="age" name="Age" required placeholder="e.g., 0 - 100" min="0" max="100">
         </div>
 
         <div class="form-group">
@@ -63,42 +63,42 @@
 
         <div class="form-group">
           <label for="bilirubin">Bilirubin (Total)</label>
-          <input type="number" step="any" id="bilirubin" name="Total_Bilirubin" required>
+          <input type="number" step="any" id="bilirubin" name="Total_Bilirubin" required placeholder="e.g., 0.1 - 10.0" min="0.1" max="10.0">
         </div>
-
+        
         <div class="form-group">
           <label for="direct_bilirubin">Bilirubin (Direct)</label>
-          <input type="number" step="any" id="direct_bilirubin" name="Direct_Bilirubin" required>
+          <input type="number" step="any" id="direct_bilirubin" name="Direct_Bilirubin" required placeholder="e.g., 0.0 - 5.0" min="0" max="5.0">
         </div>
-
+        
         <div class="form-group">
           <label for="sgot">SGOT</label>
-          <input type="number" step="any" id="sgot" name="SGOT" required>
+          <input type="number" step="any" id="sgot" name="SGOT" required placeholder="e.g., 10 - 500" min="10" max="500">
         </div>
-
+        
         <div class="form-group">
           <label for="sgpt">SGPT</label>
-          <input type="number" step ="any" id="sgpt" name="SGPT" required>
+          <input type="number" step="any" id="sgpt" name="SGPT" required placeholder="e.g., 10 - 500" min="10" max="500">
         </div>
-
+        
         <div class="form-group">
           <label for="alk_phos">Alkaline Phosphatase</label>
-          <input type="number" step="any" id="alk_phos" name="Alkaline_Phosphatase" required>
+          <input type="number" step="any" id="alk_phos" name="Alkaline_Phosphatase" required placeholder="e.g., 40 - 600" min="40" max="600">
         </div>
-
+        
         <div class="form-group">
           <label for="protein">Total Protein</label>
-          <input type="number" step="any" id="protein" name="Total_Protein" required>
+          <input type="number" step="any" id="protein" name="Total_Protein" required placeholder="e.g., 4.5 - 10.0" min="4.5" max="10.0">
         </div>
-
+        
         <div class="form-group">
           <label for="albumin">Albumin</label>
-          <input type="number" step="any" id="albumin" name="Albumin" required>
+          <input type="number" step="any" id="albumin" name="Albumin" required placeholder="e.g., 2.5 - 6.0" min="2.5" max="6.0">
         </div>
-
+        
         <div class="form-group">
           <label for="a_g_ratio">Albumin/Globulin Ratio</label>
-          <input type="number" step="any" id="a_g_ratio" name="A_G_Ratio" required>
+          <input type="number" step="any" id="a_g_ratio" name="A_G_Ratio" required placeholder="e.g., 0.3 - 2.5" min="0.3" max="2.5">
         </div>
 
         <button type="submit">Predict</button>

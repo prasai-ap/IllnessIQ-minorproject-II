@@ -49,7 +49,7 @@
           </div>
           <div class="form-group">
             <label for="age">Age</label>
-            <input type="number" id="age" name="Age" required>
+            <input type="number" id="age" name="Age" required placeholder="e.g., 0 - 100" min="0" max="100">
           </div>
           <div class="form-group">
             <label for="gender">Gender</label>
@@ -61,15 +61,18 @@
           </div>
           <div class="form-group">
             <label for="tsh">TSH (mIU/L)</label>
-            <input type="number" step="any" id="tsh" name="TSH" required>
+            <input type="number" step="any" id="tsh" name="TSH" required 
+                   placeholder="e.g., 0.1 - 100" min="0.1" max="100">
           </div>
           <div class="form-group">
             <label for="ft4">FT4 (ng/dL)</label>
-            <input type="number" step="any" id="ft4" name="FT4" required>
+            <input type="number" step="any" id="ft4" name="FT4" required 
+                   placeholder="e.g., 0.5 - 5.0" min="0.5" max="5.0">
           </div>
           <div class="form-group">
             <label for="ft3">FT3 (pg/mL)</label>
-            <input type="number" step="any" id="ft3" name="FT3" required>
+            <input type="number" step="any" id="ft3" name="FT3" required 
+                   placeholder="e.g., 1.0 - 10.0" min="1.0" max="10.0">
           </div>
           <button type="submit">Predict</button>
         </div>
