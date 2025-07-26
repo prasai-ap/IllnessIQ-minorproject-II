@@ -29,7 +29,9 @@
     </nav>
 
     <div class="save-button-container">
+        {% if user_role == 'users' %}
         <a href="{% url report_url_name record_id %}" class="save-button">Save</a>
+        {% endif %}
     </div>
 
     <main class="container">
