@@ -1422,7 +1422,6 @@ def view_predictions(request):
 
     return render(request, 'admin_predictions.html', {'predictions': predictions})
 
-    from django.views.decorators.http import require_GET
 
 @require_GET
 def fetch_admin_record_id(request):
