@@ -474,7 +474,7 @@ def predict_diabetes(request):
                 raise ValueError("Empty recommendation")
                 
         except Exception:
-            recommendation_text = "We're currently unable to generate personalized recommendations. Please consult a healthcare provider. Or you have hit maximum request limit please upgrade to premium"
+            recommendation_text = "We're currently unable to generate personalized recommendations. Please consult a healthcare provider. Or you have reached maximum request limit please upgrade to premium"
 
         with connection.cursor() as cursor:
             cursor.execute("INSERT INTO diabetes_recommendation (dr_id, recommendation) VALUES (%s, %s)", [dr_id, recommendation_text])
@@ -581,7 +581,7 @@ def predict_heart(request):
                 if not recommendation_text:
                     raise ValueError("Empty recommendation from Gemini")
             except Exception:
-                recommendation_text = "We're currently unable to generate personalized recommendations. Please consult a healthcare provider. Or you have hit maximum request limit please upgrade to premium"
+                recommendation_text = "We're currently unable to generate personalized recommendations. Please consult a healthcare provider. Or you have reached maximum request limit please upgrade to premium"
 
             with connection.cursor() as cursor:
                 cursor.execute("INSERT INTO heart_recommendation (hr_id, recommendation) VALUES (%s, %s)", [hr_id, recommendation_text])
@@ -733,7 +733,7 @@ def predict_liver(request):
                 if not recommendation_text:
                     raise ValueError("Empty recommendation from Gemini")
             except Exception:
-                recommendation_text = "We're currently unable to generate personalized recommendations. Please consult a healthcare provider. Or you have hit maximum request limit please upgrade to premium"
+                recommendation_text = "We're currently unable to generate personalized recommendations. Please consult a healthcare provider. Or you have reached maximum request limit please upgrade to premium"
 
             with connection.cursor() as cursor:
                 cursor.execute("INSERT INTO liver_recommendation (lr_id, recommendation) VALUES (%s, %s)", [lr_id, recommendation_text])
@@ -852,7 +852,7 @@ def predict_thyroid(request):
                 if not recommendation_text:
                     raise ValueError("Empty recommendation from Gemini")
             except Exception:
-                recommendation_text = "We're currently unable to generate personalized recommendations. Please consult a healthcare provider. Or you have hit maximum request limit please upgrade to premium"
+                recommendation_text = "We're currently unable to generate personalized recommendations. Please consult a healthcare provider. Or you have reached maximum request limit please upgrade to premium"
 
             with connection.cursor() as cursor:
                 cursor.execute("INSERT INTO thyroid_recommendation (tr_id, recommendation) VALUES (%s, %s)", [tr_id, recommendation_text])
