@@ -472,7 +472,7 @@ def predict_diabetes(request):
             recommendation_text = response.text.strip() if response.text else None
             if not recommendation_text:
                 raise ValueError("Empty recommendation")
-            recommendations = [markdown.markdown(s.strip()) for s in recommendation_text.split("\n\n") if s.strip()]
+
         except Exception:
             recommendation_text = "We're currently unable to generate personalized recommendations. Please consult a healthcare provider. Or you have hit maximum request limit please upgrade to premium"
 
@@ -1146,7 +1146,6 @@ def view_history_detail(request, disease, record_id):
 
     with connection.cursor() as cursor:
         if disease == 'thyroid':
-            report_download_url_name = f"download_{disease}_report"
 
             if user_role == 'admin':
                 cursor.execute("""
@@ -1189,7 +1188,6 @@ def view_history_detail(request, disease, record_id):
                 }
 
         elif disease == 'liver':
-            report_download_url_name = f"download_{disease}_report"
 
             if user_role == 'admin':
                 cursor.execute("""
@@ -1282,7 +1280,6 @@ def view_history_detail(request, disease, record_id):
                 }
 
         elif disease == 'diabetes':
-            report_download_url_name = f"download_{disease}_report"
 
             if user_role == 'admin':
                 cursor.execute("""
