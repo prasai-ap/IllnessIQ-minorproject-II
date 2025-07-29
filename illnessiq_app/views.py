@@ -907,9 +907,6 @@ def download_diabetes_report(request, dr_id):
     if not row:
         return HttpResponse("No data found", status=404)
 
-    logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'logo.png')
-    static_url = f'file://{logo_path.rsplit("/", 1)[0]}/'
-
     context = {
         'patient_name': row[0],
         'age': row[1],
@@ -921,9 +918,7 @@ def download_diabetes_report(request, dr_id):
         'hba1c': row[7],
         'glucose': row[8],
         'risk_status': row[9],
-        'recommendation_html': markdown.markdown(row[10] or ""),
-        'date': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        'STATIC_URL': static_url
+        'recommendation_html': markdown.markdown(row[10] or "")
     }
 
     template = get_template("diabetes_report_template.html")
@@ -957,9 +952,7 @@ def download_heart_report(request, hr_id):
     if not row:
         return HttpResponse("No data found", status=404)
 
-    logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'logo.png')
-    static_url = f'file://{logo_path.rsplit("/", 1)[0]}/'
-
+    
     context = {
         'patient_name': row[0],
         'age': row[1],
@@ -968,9 +961,7 @@ def download_heart_report(request, hr_id):
         'fasting_blood_sugar': row[4],
         'heart_rate': row[5],
         'risk_status': row[6],
-        'recommendation_html': markdown.markdown(row[7] or ""),
-        'date': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        'STATIC_URL': static_url
+        'recommendation_html': markdown.markdown(row[7] or "")
     }
 
     template = get_template("heart_report_template.html")
@@ -1004,8 +995,6 @@ def download_liver_report(request, lr_id):
     if not row:
         return HttpResponse("No data found", status=404)
 
-    logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'logo.png')
-    static_url = f'file://{logo_path.rsplit("/", 1)[0]}/'
 
     context = {
         'patient_name': row[0],
@@ -1020,9 +1009,7 @@ def download_liver_report(request, lr_id):
         'albumin': row[9],
         'a_g_ratio': row[10],
         'risk_status': row[11],
-        'recommendation_html': markdown.markdown(row[12] or ""),
-        'date': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        'STATIC_URL': static_url
+        'recommendation_html': markdown.markdown(row[12] or "")
     }
 
     template = get_template("liver_report_template.html")
@@ -1055,9 +1042,6 @@ def download_thyroid_report(request, tr_id):
     if not row:
         return HttpResponse("No data found", status=404)
 
-    logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'logo.png')
-    static_url = f'file://{logo_path.rsplit("/", 1)[0]}/'
-
     context = {
         'patient_name': row[0],
         'age': row[1],
@@ -1066,9 +1050,7 @@ def download_thyroid_report(request, tr_id):
         'ft4': row[4],
         'ft3': row[5],
         'risk_status': row[6],
-        'recommendation_html': markdown.markdown(row[7] or ""),
-        'date': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        'STATIC_URL': static_url
+        'recommendation_html': markdown.markdown(row[7] or "")
     }
 
     template = get_template("thyroid_report_template.html")
