@@ -17,10 +17,7 @@ import google.generativeai as genai
 import json
 from collections import defaultdict
 from django.views.decorators.http import require_GET
-import requests
-import contextlib
 
-DEV_FORCE_GEMINI_FAIL = os.getenv("DEV_FORCE_GEMINI_FAIL", "0") == "1"
 
 def index(request):
     return render(request,'index.html')
@@ -470,21 +467,15 @@ def predict_diabetes(request):
             Use bullet points for individual recommendations within each category.
             Start directly with the recommendations, no introductory sentences before the first heading.
             """
-        timeout_sec = 5  
-        fallback_text = ("We're currently unable to generate personalized recommendations. Please consult a healthcare provider. Or you have reached maximum request limit please upgrade to premium")
 
         try:
-            if DEV_FORCE_GEMINI_FAIL:
-                raise RuntimeError("Simulated Gemini failure")
-                model = genai.GenerativeModel('gemini-2.5-flash')
-                response = model.generate_content(prompt, request_options={"timeout": timeout_sec})
-                recommendation_text = (getattr(response, "text", "") or "").strip()
-                if not recommendation_text:
-                    raise ValueError("Empty recommendation")
-
-        except Exception as e:
-            print(f"[Gemini ERROR]: {e}") 
-            recommendation_text = fallback_text
+            response = genai.GenerativeModel('gemini-2.5-flash').generate_content(prompt)
+            recommendation_text = response.text.strip() if response.text else None
+            if not recommendation_text:
+                raise ValueError("Empty recommendation")
+                
+        except Exception:
+            recommendation_text = "We're currently unable to generate personalized recommendations. Please consult a healthcare provider. Or you have reached maximum request limit please upgrade to premium"
 
         with connection.cursor() as cursor:
             cursor.execute("INSERT INTO diabetes_recommendation (dr_id, recommendation) VALUES (%s, %s)", [dr_id, recommendation_text])
@@ -585,26 +576,18 @@ def predict_heart(request):
             Start directly with the recommendations, no introductory sentences before the first heading.
             """
 
-            timeout_sec = 5  
-            fallback_text = ("We're currently unable to generate personalized recommendations. Please consult a healthcare provider. Or you have reached maximum request limit please upgrade to premium")
-
             try:
-                if DEV_FORCE_GEMINI_FAIL:
-                    raise RuntimeError("Simulated Gemini failure")
-                    model = genai.GenerativeModel('gemini-2.5-flash')
-                    response = model.generate_content(prompt, request_options={"timeout": timeout_sec})
-                    recommendation_text = (getattr(response, "text", "") or "").strip()
-                    if not recommendation_text:
-                        raise ValueError("Empty recommendation")
-
-            except Exception as e:
-                print(f"[Gemini ERROR]: {e}") 
-                recommendation_text = fallback_text
+                response = genai.GenerativeModel('gemini-2.5-flash').generate_content(prompt)
+                recommendation_text = response.text.strip() if response.text else None
+                if not recommendation_text:
+                    raise ValueError("Empty recommendation from Gemini")
+            except Exception:
+                recommendation_text = "We're currently unable to generate personalized recommendations. Please consult a healthcare provider. Or you have reached maximum request limit please upgrade to premium"
 
             with connection.cursor() as cursor:
                 cursor.execute("INSERT INTO heart_recommendation (hr_id, recommendation) VALUES (%s, %s)", [hr_id, recommendation_text])
 
-                return redirect('heart_result', hr_id=hr_id)
+            return redirect('heart_result', hr_id=hr_id)
 
         except Exception as e:
             messages.error(request, f"Unexpected Error: {e}")
@@ -745,21 +728,13 @@ def predict_liver(request):
             Start directly with the recommendations, no introductory sentences before the first heading.
             """
 
-            timeout_sec = 5  
-            fallback_text = ("We're currently unable to generate personalized recommendations. Please consult a healthcare provider. Or you have reached maximum request limit please upgrade to premium")
-
             try:
-                if DEV_FORCE_GEMINI_FAIL:
-                    raise RuntimeError("Simulated Gemini failure")
-                    model = genai.GenerativeModel('gemini-2.5-flash')
-                    response = model.generate_content(prompt, request_options={"timeout": timeout_sec})
-                    recommendation_text = (getattr(response, "text", "") or "").strip()
-                    if not recommendation_text:
-                        raise ValueError("Empty recommendation")
-
-            except Exception as e:
-                print(f"[Gemini ERROR]: {e}") 
-                recommendation_text = fallback_text
+                response = genai.GenerativeModel('gemini-2.5-flash').generate_content(prompt)
+                recommendation_text = response.text.strip() if response.text else None
+                if not recommendation_text:
+                    raise ValueError("Empty recommendation from Gemini")
+            except Exception:
+                recommendation_text = "We're currently unable to generate personalized recommendations. Please consult a healthcare provider. Or you have reached maximum request limit please upgrade to premium"
 
             with connection.cursor() as cursor:
                 cursor.execute("INSERT INTO liver_recommendation (lr_id, recommendation) VALUES (%s, %s)", [lr_id, recommendation_text])
@@ -872,21 +847,13 @@ def predict_thyroid(request):
             Start directly with the recommendations, no introductory sentences before the first heading.
             """
 
-            timeout_sec = 5  
-            fallback_text = ("We're currently unable to generate personalized recommendations. Please consult a healthcare provider. Or you have reached maximum request limit please upgrade to premium")
-
             try:
-                if DEV_FORCE_GEMINI_FAIL:
-                    raise RuntimeError("Simulated Gemini failure")
-                    model = genai.GenerativeModel('gemini-2.5-flash')
-                    response = model.generate_content(prompt, request_options={"timeout": timeout_sec})
-                    recommendation_text = (getattr(response, "text", "") or "").strip()
-                    if not recommendation_text:
-                        raise ValueError("Empty recommendation")
-
-            except Exception as e:
-                print(f"[Gemini ERROR]: {e}") 
-                recommendation_text = fallback_text
+                response = genai.GenerativeModel('gemini-2.5-flash').generate_content(prompt)
+                recommendation_text = response.text.strip() if response.text else None
+                if not recommendation_text:
+                    raise ValueError("Empty recommendation from Gemini")
+            except Exception:
+                recommendation_text = "We're currently unable to generate personalized recommendations. Please consult a healthcare provider. Or you have reached maximum request limit please upgrade to premium"
 
             with connection.cursor() as cursor:
                 cursor.execute("INSERT INTO thyroid_recommendation (tr_id, recommendation) VALUES (%s, %s)", [tr_id, recommendation_text])
